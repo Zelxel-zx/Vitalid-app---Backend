@@ -68,7 +68,7 @@ Response: { message: string }
 GET /api/chat/doctor/{doctorId}
 Request: {}
 Response: [
-  { id: string, sender: string, content: string, timestamp: string }
+  { id: int, sender: string, content: string, timestamp: string }
 ]
 ```
 
@@ -76,7 +76,7 @@ Response: [
 ```
 POST /api/chat/send
 Request: { doctorId: int, content: string, senderId: string }
-Response: { id: string, sender: string, content: string, timestamp: string }
+Response: { id: int, sender: string, content: string, timestamp: string }
 ```
 
 ### Obtener mensajes sin leer
@@ -104,7 +104,7 @@ Response: { message: string }
 GET /api/treatments
 Request: {}
 Response: [
-  { id: string, title: string, doctor: string, status: string, progress: int, nextAppointment: string, medications: [string] }
+  { id: int, title: string, doctor: string, status: string, progress: int, nextAppointment: string, medications: [string] }
 ]
 ```
 
@@ -113,7 +113,7 @@ Response: [
 GET /api/treatments/active
 Request: {}
 Response: [
-  { id: string, title: string, doctor: string, status: string, progress: int, nextAppointment: string, medications: [string] }
+  { id: int, title: string, doctor: string, status: string, progress: int, nextAppointment: string, medications: [string] }
 ]
 ```
 
@@ -122,7 +122,7 @@ Response: [
 GET /api/treatments/completed
 Request: {}
 Response: [
-  { id: string, title: string, doctor: string, status: string, progress: int }
+  { id: int, title: string, doctor: string, status: string, progress: int }
 ]
 ```
 
@@ -130,7 +130,7 @@ Response: [
 ```
 POST /api/treatments
 Request: { patientId: string, title: string, status: string, medications: [string], nextAppointment: string }
-Response: { id: string, title: string, status: string }
+Response: { id: int, title: string, status: string }
 ```
 
 ### Actualizar progreso del tratamiento
@@ -149,7 +149,7 @@ Response: { message: string }
 GET /api/medications
 Request: {}
 Response: [
-  { id: string, name: string, dosage: string, frequency: string, prescribedBy: string, startDate: string, endDate: string }
+  { id: int, name: string, dosage: string, frequency: string, prescribedBy: string, startDate: string, endDate: string }
 ]
 ```
 
@@ -157,7 +157,7 @@ Response: [
 ```
 POST /api/medications
 Request: { patientId: string, name: string, dosage: string, frequency: string, startDate: string, endDate: string }
-Response: { id: string, name: string, dosage: string }
+Response: { id: int, name: string, dosage: string }
 ```
 
 ### Registrar dosis tomada
@@ -181,7 +181,7 @@ Request: {
     { medicationId: string, scheduledTimes: ["09:00"] }
   ]
 }
-Response: { id: string, medicationsAdded: int, message: string }
+Response: { id: int, medicationsAdded: int, message: string }
 ```
 
 ### Obtener checklist de medicamentos de hoy
@@ -190,8 +190,8 @@ GET /api/checklist/today
 Request: {}
 Response: [
   {
-    checklistId: string
-    medicationId: string
+    checklistId: int
+    medicationId: int
     medicationName: string
     dosage: string
     scheduledTimes: [
@@ -287,14 +287,14 @@ GET /api/appointments
 Request: { page: int, size: int }
 Response: { content: [Appointment], totalElements: int, totalPages: int, currentPage: int }
 
-Appointment: { id: string, date: string, time: string, doctor: string, reason: string, status: string }
+Appointment: { id: int, date: string, time: string, doctor: string, reason: string, status: string }
 ```
 
 ### Agendar cita
 ```
 POST /api/appointments
 Request: { doctorId: int, date: string, time: string, reason: string }
-Response: { id: string, date: string, time: string, doctor: string, status: string }
+Response: { id: int, date: string, time: string, doctor: string, status: string }
 ```
 
 ### Cancelar cita
@@ -309,7 +309,7 @@ Response: { message: string }
 GET /api/doctors/appointments
 Request: {}
 Response: [
-  { id: string, date: string, time: string, patientName: string, reason: string, status: string }
+  { id: int, date: string, time: string, patientName: string, reason: string, status: string }
 ]
 ```
 

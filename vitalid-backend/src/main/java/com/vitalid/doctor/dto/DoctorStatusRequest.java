@@ -1,6 +1,5 @@
 package com.vitalid.doctor.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +10,10 @@ import lombok.NoArgsConstructor;
  * - status (ONLINE, OFFLINE, BUSY)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class DoctorStatusRequest {
 
     // TODO: Add properties
 
 }
+

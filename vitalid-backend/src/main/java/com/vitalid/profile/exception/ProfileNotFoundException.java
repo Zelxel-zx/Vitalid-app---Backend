@@ -13,3 +13,4 @@ public class ProfileNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

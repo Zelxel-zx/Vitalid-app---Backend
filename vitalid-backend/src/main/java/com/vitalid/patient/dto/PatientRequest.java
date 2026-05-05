@@ -1,6 +1,5 @@
 package com.vitalid.patient.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
  * Used for creating and updating patient data
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class PatientRequest {
 
@@ -26,3 +24,4 @@ public class PatientRequest {
     private String allergies;
     private Boolean isActive;
 }
+

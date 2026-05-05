@@ -1,6 +1,5 @@
 package com.vitalid.treatment.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
@@ -16,10 +15,10 @@ import java.util.List;
  * - nextAppointment (date)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class TreatmentRequest {
 
     // TODO: Add properties
 
 }
+

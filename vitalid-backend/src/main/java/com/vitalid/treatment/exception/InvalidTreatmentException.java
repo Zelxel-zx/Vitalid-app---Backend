@@ -13,3 +13,4 @@ public class InvalidTreatmentException extends RuntimeException {
         super(message, cause);
     }
 }
+

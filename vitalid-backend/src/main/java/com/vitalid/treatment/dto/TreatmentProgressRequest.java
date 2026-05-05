@@ -1,6 +1,5 @@
 package com.vitalid.treatment.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +10,10 @@ import lombok.NoArgsConstructor;
  * - progress (0-100 percentage)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class TreatmentProgressRequest {
 
     // TODO: Add properties
 
 }
+

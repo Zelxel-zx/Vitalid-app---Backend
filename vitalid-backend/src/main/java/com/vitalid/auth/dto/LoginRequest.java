@@ -1,6 +1,5 @@
 package com.vitalid.auth.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,10 +11,10 @@ import lombok.NoArgsConstructor;
  * - password (required)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class LoginRequest {
 
     // TODO: Add properties
 
 }
+

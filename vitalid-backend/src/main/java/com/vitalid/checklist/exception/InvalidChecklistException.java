@@ -13,3 +13,4 @@ public class InvalidChecklistException extends RuntimeException {
         super(message, cause);
     }
 }
+

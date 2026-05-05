@@ -1,7 +1,6 @@
 package com.vitalid.patient.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.vitalid.auth.entity.User;
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "patients")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Patient {
 
@@ -74,3 +72,4 @@ public class Patient {
         updatedAt = LocalDateTime.now();
     }
 }
+

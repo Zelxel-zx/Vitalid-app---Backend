@@ -13,3 +13,4 @@ public class MessageNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

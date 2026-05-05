@@ -1,6 +1,5 @@
 package com.vitalid.appointment.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,10 +15,10 @@ import lombok.NoArgsConstructor;
  * - status (SCHEDULED, COMPLETED, CANCELLED, NO_SHOW)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class AppointmentResponse {
 
     // TODO: Add properties
 
 }
+

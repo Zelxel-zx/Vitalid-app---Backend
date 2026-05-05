@@ -9,17 +9,13 @@ import java.util.List;
 /**
  * HealthMetric Repository
  * Data access for HealthMetric entity
- * 
- * TODO: Implement query methods:
- * - findByPatientId(String patientId)
- * - findByPatientIdAndMetric(String patientId, String metric)
- * - findByPatientIdAndMetricAndTimestampBetween(String patientId, String metric, LocalDateTime from, LocalDateTime to)
- * - findByMetric(String metric)
- * - findLatestByPatientIdAndMetric(String patientId, String metric)
  */
 @Repository
-public interface HealthMetricRepository extends JpaRepository<HealthMetric, String> {
+public interface HealthMetricRepository extends JpaRepository<HealthMetric, Long> {
 
-    // TODO: Add custom query methods
-
+    List<HealthMetric> findByPatientId(Long patientId);
+    List<HealthMetric> findByPatientIdAndMetric(Long patientId, String metric);
+    List<HealthMetric> findByMetric(String metric);
+    List<HealthMetric> findByPatientIdAndMetricAndTimestampBetween(Long patientId, String metric, LocalDateTime from, LocalDateTime to);
 }
+

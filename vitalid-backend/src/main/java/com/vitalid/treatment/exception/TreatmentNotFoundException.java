@@ -13,3 +13,4 @@ public class TreatmentNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

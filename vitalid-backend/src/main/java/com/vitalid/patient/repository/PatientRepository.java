@@ -38,3 +38,4 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
      */
     boolean existsByUserId(Long userId);
 }
+

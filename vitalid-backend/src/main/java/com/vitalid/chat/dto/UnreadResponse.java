@@ -1,6 +1,5 @@
 package com.vitalid.chat.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,10 +11,10 @@ import lombok.NoArgsConstructor;
  * - unreadCount (number of unread messages)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class UnreadResponse {
 
     // TODO: Add properties
 
 }
+

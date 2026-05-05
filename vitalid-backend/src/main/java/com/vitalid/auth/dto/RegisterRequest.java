@@ -1,6 +1,5 @@
 package com.vitalid.auth.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,10 +14,10 @@ import lombok.NoArgsConstructor;
  * - type (required, enum: PATIENT, DOCTOR)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
 
     // TODO: Add properties
 
 }
+

@@ -1,23 +1,166 @@
 package com.vitalid.checklist.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.vitalid.checklist.entity.Checklist;
+import com.vitalid.checklist.entity.DosageRecord;
+import com.vitalid.checklist.entity.ScheduledTime;
+import com.vitalid.checklist.repository.ChecklistRepository;
+import com.vitalid.checklist.repository.DosageRecordRepository;
+import com.vitalid.medication.entity.Medication;
+import com.vitalid.medication.repository.MedicationRepository;
+import com.vitalid.patient.entity.Patient;
+import com.vitalid.patient.repository.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Checklist Controller
  * Handles medication adherence checklists and dosage records
  */
 @RestController
-@RequestMapping("/api/checklists")
+@RequestMapping({"/api/checklist", "/api/checklists"})
 public class ChecklistController {
 
-    // TODO: Implement checklist endpoints
-    // GET /api/checklists - List checklists
-    // GET /api/checklists/{id} - Get checklist details
-    // POST /api/checklists - Create new checklist
-    // PUT /api/checklists/{id} - Update checklist
-    // DELETE /api/checklists/{id} - Delete checklist
-    // GET /api/checklists/{id}/dosage-records - Get dosage records
-    // POST /api/checklists/{id}/dosage-records - Record dosage
+    private final ChecklistRepository checklistRepository;
+    private final MedicationRepository medicationRepository;
+    private final PatientRepository patientRepository;
+    private final DosageRecordRepository dosageRecordRepository;
 
+    @Autowired
+    public ChecklistController(ChecklistRepository checklistRepository,
+                               MedicationRepository medicationRepository,
+                               PatientRepository patientRepository,
+                               DosageRecordRepository dosageRecordRepository) {
+        this.checklistRepository = checklistRepository;
+        this.medicationRepository = medicationRepository;
+        this.patientRepository = patientRepository;
+        this.dosageRecordRepository = dosageRecordRepository;
+    }
+
+    @PostMapping
+    public ResponseEntity<CreateChecklistResponse> createChecklist(@RequestBody ChecklistRequest request) {
+        int added = 0;
+        for (ChecklistMedication item : request.medications()) {
+            Medication medication = medicationRepository.findById(item.medicationId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medication not found: " + item.medicationId()));
+            Checklist checklist = new Checklist();
+            checklist.setMedication(medication);
+            checklist.setPatient(medication.getPatient());
+            checklist.setScheduledTimes(new ArrayList<>());
+            checklist.setDosageRecords(new ArrayList<>());
+            if (item.scheduledTimes() != null) {
+                List<ScheduledTime> schedule = new ArrayList<>();
+                for (String time : item.scheduledTimes()) {
+                    ScheduledTime scheduledTime = new ScheduledTime();
+                    scheduledTime.setChecklist(checklist);
+                    scheduledTime.setTime(time);
+                    schedule.add(scheduledTime);
+                }
+                checklist.setScheduledTimes(schedule);
+            }
+            checklistRepository.save(checklist);
+            added++;
+        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new CreateChecklistResponse(added, "Checklist items created"));
+    }
+
+    @GetMapping("/today")
+    public List<ChecklistTodayResponse> getChecklistForToday() {
+        return checklistRepository.findAll().stream().map(this::toTodayResponse).toList();
+    }
+
+    @PostMapping("/{medicationId}/mark-taken")
+    public ResponseEntity<MessageResponse> markTaken(@PathVariable Long medicationId, @RequestBody ChecklistMarkTakenRequest request) {
+        Medication medication = medicationRepository.findById(medicationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medication not found"));
+
+        Checklist checklist = checklistRepository.findByMedicationId(medicationId).stream().findFirst()
+                .orElseGet(() -> createChecklistForMedication(medication));
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        if (request.timestamp() != null) {
+            try {
+                timestamp = LocalDateTime.parse(request.timestamp());
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        DosageRecord record = new DosageRecord();
+        record.setChecklist(checklist);
+        record.setMedication(medication);
+        record.setScheduledTime(request.time());
+        record.setActualTime(request.timestamp());
+        record.setIsTaken(true);
+        record.setTimestamp(timestamp);
+        dosageRecordRepository.save(record);
+
+        return ResponseEntity.ok(new MessageResponse("Dosage marked as taken"));
+    }
+
+    private Checklist createChecklistForMedication(Medication medication) {
+        Checklist checklist = new Checklist();
+        checklist.setMedication(medication);
+        checklist.setPatient(medication.getPatient());
+        checklist.setScheduledTimes(new ArrayList<>());
+        checklist.setDosageRecords(new ArrayList<>());
+        return checklistRepository.save(checklist);
+    }
+
+    private ChecklistTodayResponse toTodayResponse(Checklist checklist) {
+        List<ScheduleItem> schedule = new ArrayList<>();
+        if (checklist.getScheduledTimes() != null) {
+            for (ScheduledTime scheduledTime : checklist.getScheduledTimes()) {
+                boolean taken = false;
+                String actualTime = null;
+                if (checklist.getDosageRecords() != null) {
+                    Optional<DosageRecord> takenRecord = checklist.getDosageRecords().stream()
+                            .filter(d -> d.getScheduledTime() != null && d.getScheduledTime().equals(scheduledTime.getTime()) && Boolean.TRUE.equals(d.getIsTaken()))
+                            .findFirst();
+                    if (takenRecord.isPresent()) {
+                        taken = true;
+                        actualTime = takenRecord.get().getActualTime();
+                    }
+                }
+                schedule.add(new ScheduleItem(scheduledTime.getTime(), taken, actualTime));
+            }
+        }
+        return new ChecklistTodayResponse(
+                checklist.getId(),
+                checklist.getMedication().getId(),
+                checklist.getMedication().getName(),
+                checklist.getMedication().getDosage(),
+                schedule
+        );
+    }
+
+    public record ChecklistRequest(List<ChecklistMedication> medications) {
+    }
+
+    public record ChecklistMedication(Long medicationId, List<String> scheduledTimes) {
+    }
+
+    public record ChecklistTodayResponse(Long checklistId, Long medicationId, String medicationName, String dosage, List<ScheduleItem> scheduledTimes) {
+    }
+
+    public record ScheduleItem(String time, boolean taken, String actualTime) {
+    }
+
+    public record ChecklistMarkTakenRequest(String time, String timestamp) {
+    }
+
+    public record CreateChecklistResponse(int medicationsAdded, String message) {
+    }
+
+    public record MessageResponse(String message) {
+    }
 }
+

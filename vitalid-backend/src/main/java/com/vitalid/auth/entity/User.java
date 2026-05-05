@@ -4,23 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
 
-/**
- * User Entity
- * Represents a user in the system (Patient or Doctor)
- * 
- * TODO: Implement user entity with:
- * - id (auto-generated)
- * - email (unique)
- * - password (hashed)
- * - name
- * - phone
- * - type (PATIENT, DOCTOR)
- * - createdAt
- * - updatedAt
- * - relationships to other entities
- */
 @Entity
 @Table(name = "users")
 @Data
@@ -28,6 +12,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class User {
     
-    // TODO: Add entity properties and annotations
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = true, length = 20)
+    private String phone;
+
+    @Column(nullable = false)
+    private UserType type;
 }

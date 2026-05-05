@@ -1,6 +1,7 @@
 package com.vitalid.auth.repository;
 
 import com.vitalid.auth.entity.User;
+import com.vitalid.auth.entity.UserType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
@@ -14,11 +15,12 @@ import java.util.Optional;
  * - findByPhone(String phone)
  * - existsByEmail(String email)
  * - existsByPhone(String phone)
- * - findByType(String type)
+ * - findByType(UserType type)
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // TODO: Add custom query methods
-
+    Optional<User> findByEmail(String email);
+    boolean existsByEmail(String email);
+    List<User> findByType(UserType type);
 }

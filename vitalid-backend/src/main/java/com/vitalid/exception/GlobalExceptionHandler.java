@@ -18,6 +18,7 @@ import com.vitalid.checklist.exception.*;
 import com.vitalid.doctor.exception.*;
 import com.vitalid.health.exception.*;
 import com.vitalid.medication.exception.*;
+import com.vitalid.patient.exception.*;
 import com.vitalid.profile.exception.*;
 import com.vitalid.treatment.exception.*;
 
@@ -153,6 +154,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(PatientNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePatientNotFoundException(PatientNotFoundException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            ex.getMessage(),
+            "Patient Not Found",
+            HttpStatus.NOT_FOUND.value(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        logger.warn("Patient not found: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
     // ==================== Bad Request Exceptions (400) ====================
 
     @ExceptionHandler(BadRequestException.class)
@@ -248,6 +261,18 @@ public class GlobalExceptionHandler {
             request.getDescription(false).replace("uri=", "")
         );
         logger.warn("Invalid treatment: {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidPatientException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPatientException(InvalidPatientException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            ex.getMessage(),
+            "Invalid Patient",
+            HttpStatus.BAD_REQUEST.value(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        logger.warn("Invalid patient: {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

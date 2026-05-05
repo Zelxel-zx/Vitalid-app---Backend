@@ -48,6 +48,10 @@ Each service module has its own `exception` subfolder:
 - `MedicationNotFoundException` - Thrown when a medication is not found
 - `InvalidMedicationException` - Thrown when medication data is invalid
 
+#### Patient Service
+- `PatientNotFoundException` - Thrown when a patient is not found
+- `InvalidPatientException` - Thrown when patient data is invalid
+
 #### Profile Service
 - `ProfileNotFoundException` - Thrown when a profile is not found
 - `InvalidProfileException` - Thrown when profile data is invalid

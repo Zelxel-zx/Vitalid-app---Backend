@@ -5,7 +5,7 @@ import com.vitalid.auth.entity.UserType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
-
+import java.util.List;
 /**
  * User Repository
  * Data access for User entity

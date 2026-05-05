@@ -1,22 +1,8 @@
 package com.vitalid.auth.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.vitalid.auth.entity.UserType;
 
-/**
- * DTO para response de autenticación
- * 
- * TODO: Implement AuthResponse with:
- * - id (user ID)
- * - name
- * - email
- * - type (PATIENT, DOCTOR)
- * - token (JWT)
- * - message
- */
-public record AuthResponse (
-
+public record AuthResponse(
     // TODO: Add properties
     Long id,
     String name,

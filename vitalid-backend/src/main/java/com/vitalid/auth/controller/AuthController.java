@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import com.vitalid.auth.dto.AuthResponse;
 import com.vitalid.auth.dto.LoginRequest;
 import com.vitalid.auth.dto.RegisterRequest;
 import com.vitalid.auth.service.AuthService;
+import com.vitalid.auth.exception.InvalidCredentialsException;
 import com.vitalid.exception.ApiResponse;
 
 /**

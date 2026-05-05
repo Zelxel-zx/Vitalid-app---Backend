@@ -1,14 +1,12 @@
 package com.vitalid.auth.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.vitalid.auth.entity.UserType;
 
 
-public record RegisterRequest (
+public record RegisterRequest(
 
     @Email(message = "Email inválido")
     @NotBlank(message = "Email es obligatorio")
@@ -28,5 +26,4 @@ public record RegisterRequest (
 
     @NotBlank(message = "Tipo es obligatorio")
     UserType type
-
 ) {}

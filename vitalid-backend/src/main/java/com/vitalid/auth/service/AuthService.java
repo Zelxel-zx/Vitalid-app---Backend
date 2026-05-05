@@ -30,7 +30,7 @@ public class AuthService {
     private UserRepository userRepository;
     
     @Autowired
-    private JwtTokenProvider jwTokenProvider;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -41,8 +41,8 @@ public class AuthService {
             // Guardar en la base de datos
             // Generar token JWT
             // Retornar AuthResponse con datos del usuario y token
-        if(UserRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException();
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new InvalidCredentialsException("El email ya está registrado");
         }
         User user = new User();
         user.setEmail(request.getEmail());
@@ -53,7 +53,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String token = jwTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user);
         return new AuthResponse(
             user.getId(), 
             user.getName(), 
@@ -71,7 +71,7 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user);
         
         return new AuthResponse(
             user.getId(), 
@@ -85,17 +85,17 @@ public class AuthService {
     // 3. Validar token
     public boolean validateToken(String token) {
         // Verificar si el token es válido
-        return jwTokenProvider.validateToken(token);
+        return jwtTokenProvider.validateToken(token);
     }
     
     // 4. Refrescar token
     public String refreshToken(String token) {
         // Generar nuevo token
         if(validateToken(token)) {
-            String email = jwTokenProvider.getEmailFromToken(token);
+            String email = jwtTokenProvider.getEmailFromToken(token);
             User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException());
-            return jwTokenProvider.generateToken(user);
+            return jwtTokenProvider.generateToken(user);
         }
         throw new InvalidCredentialsException();
     }

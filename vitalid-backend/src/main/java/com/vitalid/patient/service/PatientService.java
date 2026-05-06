@@ -35,7 +35,7 @@ public class PatientService {
      */
     public PatientResponse getPatientById(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
+                .orElseThrow(() -> new PatientNotFoundException("Paciente no encontrado con id: " + id));
         return toResponse(patient);
     }
 
@@ -45,7 +45,7 @@ public class PatientService {
      */
     public PatientResponse createPatient(Long userId, PatientRequest request) {
         if (request.getDateOfBirth() == null) {
-            throw new InvalidPatientException("Date of birth is required");
+            throw new InvalidPatientException("Se requiere la fecha de nacimiento");
         }
 
         Patient patient = new Patient();
@@ -64,7 +64,7 @@ public class PatientService {
      */
     public PatientResponse updatePatient(Long id, PatientRequest request) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
+                .orElseThrow(() -> new PatientNotFoundException("Paciente no encontrado con id: " + id));
 
         if (request.getDateOfBirth() != null) {
             patient.setDateOfBirth(request.getDateOfBirth());
@@ -88,7 +88,7 @@ public class PatientService {
      */
     public void deletePatient(Long id) {
         if (!patientRepository.existsById(id)) {
-            throw new PatientNotFoundException("Patient not found with id: " + id);
+            throw new PatientNotFoundException("Paciente no encontrado con id: " + id);
         }
         patientRepository.deleteById(id);
     }

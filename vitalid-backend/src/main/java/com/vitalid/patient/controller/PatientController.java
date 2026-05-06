@@ -29,7 +29,7 @@ public class PatientController {
     @GetMapping
     public ApiResponse<List<PatientResponse>> getAllPatients() {
         List<PatientResponse> patients = patientService.getAllPatients();
-        return ApiResponse.ok("Patients retrieved successfully", patients);
+        return ApiResponse.ok("Pacientes recuperados exitosamente", patients);
     }
 
     /**
@@ -38,7 +38,7 @@ public class PatientController {
     @GetMapping("/{id}")
     public ApiResponse<PatientResponse> getPatientById(@PathVariable Long id) {
         PatientResponse patient = patientService.getPatientById(id);
-        return ApiResponse.ok("Patient retrieved successfully", patient);
+        return ApiResponse.ok("Paciente recuperado exitosamente", patient);
     }
 
     /**
@@ -52,7 +52,7 @@ public class PatientController {
         Long userId = user.getId();
         
         PatientResponse patient = patientService.createPatient(userId, request);
-        return ApiResponse.ok("Patient created successfully", patient);
+        return ApiResponse.ok("Paciente creado exitosamente", patient);
     }
 
     /**
@@ -63,7 +63,7 @@ public class PatientController {
             @PathVariable Long id,
             @RequestBody PatientRequest request) {
         PatientResponse patient = patientService.updatePatient(id, request);
-        return ApiResponse.ok("Patient updated successfully", patient);
+        return ApiResponse.ok("Paciente actualizado exitosamente", patient);
     }
 
     /**
@@ -72,7 +72,7 @@ public class PatientController {
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deletePatient(@PathVariable Long id) {
         patientService.deletePatient(id);
-        return ApiResponse.ok("Patient deleted successfully", null);
+        return ApiResponse.ok("Paciente eliminado exitosamente", null);
     }
 
     /**
@@ -81,7 +81,7 @@ public class PatientController {
     @GetMapping("/filter/blood-type/{bloodType}")
     public ApiResponse<List<PatientResponse>> getPatientsByBloodType(@PathVariable String bloodType) {
         List<PatientResponse> patients = patientService.getPatientsByBloodType(bloodType);
-        return ApiResponse.ok("Patients retrieved successfully", patients);
+        return ApiResponse.ok("Paciente recuperado exitosamente", patients);
     }
 
     /**
@@ -90,7 +90,7 @@ public class PatientController {
     @GetMapping("/filter/allergy/{allergy}")
     public ApiResponse<List<PatientResponse>> getPatientsByAllergy(@PathVariable String allergy) {
         List<PatientResponse> patients = patientService.getPatientsByAllergy(allergy);
-        return ApiResponse.ok("Patients retrieved successfully", patients);
+        return ApiResponse.ok("Paciente recuperado exitosamente", patients);
     }
 
 }

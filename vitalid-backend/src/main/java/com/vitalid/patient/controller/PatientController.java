@@ -85,12 +85,4 @@ public class PatientController {
         return ApiResponse.ok("Patients retrieved successfully", patients);
     }
 
-    /**
-     * Get patients by city
-     */
-    @GetMapping("/filter/city/{city}")
-    public ApiResponse<List<PatientResponse>> getPatientsByCity(@PathVariable String city) {
-        List<PatientResponse> patients = patientService.getPatientsByCity(city);
-        return ApiResponse.ok("Patients retrieved successfully", patients);
-    }
 }

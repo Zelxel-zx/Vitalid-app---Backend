@@ -23,11 +23,8 @@ public class PatientService {
     @Autowired
     private PatientRepository patientRepository;
 
-    /**
-     * Get all active patients
-     */
     public List<PatientResponse> getAllPatients() {
-        return patientRepository.findByIsActiveTrue()
+        return patientRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -43,39 +40,20 @@ public class PatientService {
     }
 
     /**
-     * Get patient by user ID
-     */
-    public PatientResponse getPatientByUserId(Long userId) {
-        Patient patient = patientRepository.findByUserId(userId)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found for user id: " + userId));
-        return toResponse(patient);
-    }
-
-    /**
      * Create a new patient
+     * Note: Patient inherits from User, so User record must be created first via AuthService.register()
      */
-    public PatientResponse createPatient(PatientRequest request) {
-        if (request.getUserId() == null) {
-            throw new InvalidPatientException("User ID is required");
-        }
-
+    public PatientResponse createPatient(Long userId, PatientRequest request) {
         if (request.getDateOfBirth() == null) {
             throw new InvalidPatientException("Date of birth is required");
         }
 
         Patient patient = new Patient();
-        patient.setUser(new User());
-        patient.getUser().setId(request.getUserId());
+        patient.setId(userId);
         patient.setDateOfBirth(request.getDateOfBirth());
         patient.setBloodType(request.getBloodType());
-        patient.setPhoneNumber(request.getPhoneNumber());
-        patient.setAddress(request.getAddress());
-        patient.setCity(request.getCity());
-        patient.setState(request.getState());
-        patient.setZipCode(request.getZipCode());
         patient.setMedicalHistory(request.getMedicalHistory());
         patient.setAllergies(request.getAllergies());
-        patient.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
 
         Patient savedPatient = patientRepository.save(patient);
         return toResponse(savedPatient);
@@ -94,29 +72,11 @@ public class PatientService {
         if (request.getBloodType() != null) {
             patient.setBloodType(request.getBloodType());
         }
-        if (request.getPhoneNumber() != null) {
-            patient.setPhoneNumber(request.getPhoneNumber());
-        }
-        if (request.getAddress() != null) {
-            patient.setAddress(request.getAddress());
-        }
-        if (request.getCity() != null) {
-            patient.setCity(request.getCity());
-        }
-        if (request.getState() != null) {
-            patient.setState(request.getState());
-        }
-        if (request.getZipCode() != null) {
-            patient.setZipCode(request.getZipCode());
-        }
         if (request.getMedicalHistory() != null) {
             patient.setMedicalHistory(request.getMedicalHistory());
         }
         if (request.getAllergies() != null) {
             patient.setAllergies(request.getAllergies());
-        }
-        if (request.getIsActive() != null) {
-            patient.setIsActive(request.getIsActive());
         }
 
         Patient updatedPatient = patientRepository.save(patient);
@@ -124,13 +84,13 @@ public class PatientService {
     }
 
     /**
-     * Delete a patient (soft delete)
+     * Delete a patient (hard delete)
      */
     public void deletePatient(Long id) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
-        patient.setIsActive(false);
-        patientRepository.save(patient);
+        if (!patientRepository.existsById(id)) {
+            throw new PatientNotFoundException("Patient not found with id: " + id);
+        }
+        patientRepository.deleteById(id);
     }
 
     /**
@@ -143,11 +103,8 @@ public class PatientService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Get patients by city
-     */
-    public List<PatientResponse> getPatientsByCity(String city) {
-        return patientRepository.findByCity(city)
+    public List<PatientResponse> getPatientsByAllergy(String allergy) {
+        return patientRepository.findByAllergiesContaining(allergy)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -157,23 +114,11 @@ public class PatientService {
      * Convert Patient entity to PatientResponse DTO
      */
     private PatientResponse toResponse(Patient patient) {
-        PatientResponse response = new PatientResponse();
-        response.setId(patient.getId());
-        response.setUserId(patient.getUser().getId());
-        response.setEmail(patient.getUser().getEmail());
-        response.setName(patient.getUser().getName());
-        response.setDateOfBirth(patient.getDateOfBirth());
-        response.setBloodType(patient.getBloodType());
-        response.setPhone(patient.getPhoneNumber());
-        response.setAddress(patient.getAddress());
-        response.setCity(patient.getCity());
-        response.setState(patient.getState());
-        response.setZipCode(patient.getZipCode());
-        response.setMedicalHistory(patient.getMedicalHistory());
-        response.setAllergies(patient.getAllergies());
-        response.setIsActive(patient.getIsActive());
-        response.setCreatedAt(patient.getCreatedAt());
-        response.setUpdatedAt(patient.getUpdatedAt());
-        return response;
+        return new PatientResponse(
+            patient.getDateOfBirth(),
+            patient.getBloodType(),
+            patient.getMedicalHistory(),
+            patient.getAllergies()
+        );
     }
 }

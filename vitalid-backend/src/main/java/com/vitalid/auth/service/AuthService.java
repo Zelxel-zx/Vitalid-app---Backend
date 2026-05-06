@@ -1,5 +1,7 @@
 package com.vitalid.auth.service;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vitalid.auth.dto.LoginRequest;
@@ -9,8 +11,12 @@ import com.vitalid.auth.entity.User;
 import com.vitalid.auth.entity.UserType;
 import com.vitalid.auth.exception.InvalidCredentialsException;
 import com.vitalid.auth.repository.UserRepository;
+import com.vitalid.exception.ResourceNotFoundException;
+import com.vitalid.patient.dto.PatientResponse;
+import com.vitalid.patient.entity.Patient;
 import com.vitalid.security.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.List;
 /**
  * Authentication Service
  * Handles user registration and login
@@ -101,5 +107,45 @@ public class AuthService {
     }
     public void logout() {
         // Se configura en el frontend eliminando el token del almacenamiento local
+    }
+
+
+    public AuthResponse updateUser(Long userId, RegisterRequest request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        if (request.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        
+        User updatedUser = userRepository.save(user);
+        return toResponse(updatedUser);
+    }
+
+    private AuthResponse toResponse(User user) {
+        return new AuthResponse(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getType(),
+            jwtTokenProvider.generateToken(user),
+            "Operación exitosa"
+        );
+    }
+
+    public List<AuthResponse> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 }

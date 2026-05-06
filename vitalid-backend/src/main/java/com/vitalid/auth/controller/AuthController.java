@@ -1,15 +1,18 @@
 package com.vitalid.auth.controller;
 
-import com.vitalid.auth.entity.User;
-import com.vitalid.auth.repository.UserRepository;
-import com.vitalid.security.JwtTokenProvider;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Optional;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import com.vitalid.auth.dto.AuthResponse;
+import com.vitalid.auth.dto.LoginRequest;
+import com.vitalid.auth.dto.RegisterRequest;
+import com.vitalid.auth.service.AuthService;
+import com.vitalid.auth.exception.InvalidCredentialsException;
+import com.vitalid.exception.ApiResponse;
 
 /**
  * Authentication Controller
@@ -17,88 +20,72 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Registro y autenticacion de usuarios")
 public class AuthController {
-
-    private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    // TODO: Implement authentication endpoints
+    // POST /api/auth/register - Register new user
+    // POST /api/auth/login - User login
+    // POST /api/auth/refresh-token - Refresh JWT token
+    // POST /api/auth/logout - User logout
+    // GET /api/auth/verify - Verify token
 
     @Autowired
-    public AuthController(UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
-        this.userRepository = userRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
-
+    private AuthService authService;
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
-        if (request.email() == null || request.password() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and password are required");
-        }
-
-        if (userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
-        }
-
-        User user = new User();
-        user.setName(request.name());
-        user.setEmail(request.email());
-        user.setPassword(request.password());
-        user.setPhone(request.phone());
-        user.setType(request.type() == null ? "PATIENT" : request.type());
-        User saved = userRepository.save(user);
-        String token = jwtTokenProvider.generateToken(saved.getId(), saved.getEmail());
-
+    public ResponseEntity<ApiResponse<AuthResponse>> register(
+    @Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new RegisterResponse(saved.getId(), "User registered successfully", token));
+        .body(ApiResponse.ok(response));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        if (request.email() == null || request.password() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email and password are required");
+    public ResponseEntity<ApiResponse<AuthResponse>> login(
+    @Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<String>> refreshToken(
+    @RequestHeader("Authorization") String authHeader) {
+    
+        // Validar que el header exista
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new InvalidCredentialsException("Token no proporcionado");
         }
-
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials"));
-
-        if (!request.password().equals(user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid credentials");
-        }
-
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getEmail());
-        return ResponseEntity.ok(new LoginResponse(user.getId(), user.getName(), user.getEmail(), user.getType(), token));
+        
+        // Extraer token (elimina "Bearer ")
+        String token = authHeader.substring(7);
+        
+        // Generar nuevo token
+        String newToken = authService.refreshToken(token);
+        
+        return ResponseEntity.ok(ApiResponse.ok("Token refrescado exitosamente", newToken));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<MessageResponse> logout() {
-        return ResponseEntity.ok(new MessageResponse("Logout successful"));
+    public ResponseEntity<ApiResponse<String>> logout() {
+        return ResponseEntity.ok(ApiResponse.ok("Logout exitoso"));
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<MessageResponse> verifyToken(@RequestHeader("Authorization") String authorization) {
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Authorization header missing");
+    public ResponseEntity<ApiResponse<Boolean>> verifyToken(
+    @RequestHeader("Authorization") String authHeader) {
+    
+        // Validar que el header exista
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.ok(ApiResponse.ok(false));
         }
-        String token = authorization.substring(7);
-        boolean valid = jwtTokenProvider.validateToken(token);
-        if (!valid) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
-        }
-        return ResponseEntity.ok(new MessageResponse("Token is valid"));
+        
+        // Extraer token
+        String token = authHeader.substring(7);
+        
+        // Validar token
+        boolean isValid = authService.validateToken(token);
+        
+        return ResponseEntity.ok(ApiResponse.ok(isValid));
     }
 
-    public record RegisterRequest(String email, String password, String name, String phone, String type) {
-    }
-
-    public record RegisterResponse(Long id, String message, String token) {
-    }
-
-    public record LoginRequest(String email, String password) {
-    }
-
-    public record LoginResponse(Long id, String name, String email, String type, String token) {
-    }
-
-    public record MessageResponse(String message) {
-    }
 }
 

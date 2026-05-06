@@ -1,10 +1,16 @@
 package com.vitalid.auth.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vitalid.auth.dto.LoginRequest;
 import com.vitalid.auth.dto.RegisterRequest;
 import com.vitalid.auth.dto.AuthResponse;
-
+import com.vitalid.auth.entity.User;
+import com.vitalid.auth.entity.UserType;
+import com.vitalid.auth.exception.InvalidCredentialsException;
+import com.vitalid.auth.repository.UserRepository;
+import com.vitalid.security.JwtTokenProvider;
+import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * Authentication Service
  * Handles user registration and login
@@ -20,6 +26,81 @@ import com.vitalid.auth.dto.AuthResponse;
 public class AuthService {
 
     // TODO: Implement authentication business logic
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public AuthResponse register(RegisterRequest request) {
+            // Verificar si el email o teléfono ya existen
+            // Crear nuevo usuario
+            // Guardar en la base de datos
+            // Generar token JWT
+            // Retornar AuthResponse con datos del usuario y token
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new InvalidCredentialsException("El email ya está registrado");
+        }
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setName(request.getName());
+        user.setPhone(request.getPhone());
+        user.setType(request.getType());
+
+        userRepository.save(user);
+
+        String token = jwtTokenProvider.generateToken(user);
+        return new AuthResponse(
+            user.getId(), 
+            user.getName(), 
+            user.getEmail(), 
+            user.getType(), 
+            token, 
+            "Usuario registrado exitosamente");  
+    }
+
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new InvalidCredentialsException());
+        
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+
+        String token = jwtTokenProvider.generateToken(user);
+        
+        return new AuthResponse(
+            user.getId(), 
+            user.getName(), 
+            user.getEmail(), 
+            user.getType(), 
+            token, 
+            "Inicio de sesión exitoso");
+    }
+
+    // 3. Validar token
+    public boolean validateToken(String token) {
+        // Verificar si el token es válido
+        return jwtTokenProvider.validateToken(token);
+    }
+    
+    // 4. Refrescar token
+    public String refreshToken(String token) {
+        // Generar nuevo token
+        if(validateToken(token)) {
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException());
+            return jwtTokenProvider.generateToken(user);
+        }
+        throw new InvalidCredentialsException();
+    }
+    public void logout() {
+        // Se configura en el frontend eliminando el token del almacenamiento local
+    }
 }
 

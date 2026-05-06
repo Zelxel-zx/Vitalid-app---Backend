@@ -1,20 +1,21 @@
 package com.vitalid.auth.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-/**
- * DTO para request de login
- * 
- * TODO: Implement LoginRequest with:
- * - email (required)
- * - password (required)
- */
-@Data
-@NoArgsConstructor
-public class LoginRequest {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    // TODO: Add properties
+public record LoginRequest(
 
-}
+
+    @Email(message = "Email inválido")
+    @NotBlank(message = "Email es obligatorio")
+    String email,
+
+
+    @NotBlank(message = "Contraseña es obligatoria")
+    @Size(min = 6, max = 100, message = "Contraseña debe tener entre 6 y 100 caracteres")
+    String password
+
+) {}
 

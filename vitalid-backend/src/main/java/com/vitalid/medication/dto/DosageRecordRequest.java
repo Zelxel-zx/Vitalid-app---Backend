@@ -1,6 +1,5 @@
 package com.vitalid.medication.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +10,10 @@ import lombok.NoArgsConstructor;
  * - timestamp (when the dose was taken)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class DosageRecordRequest {
 
     // TODO: Add properties
 
 }
+

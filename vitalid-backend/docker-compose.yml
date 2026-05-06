@@ -1,14 +1,38 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:16
+    container_name: vitalid-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: vitalid_db
+      POSTGRES_USER: vitalid_user
+      POSTGRES_PASSWORD: vitalid_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - vitalid_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vitalid-network
+
   vitalid-backend:
     build: .
     container_name: vitalid-backend
+    restart: no
+    depends_on:
+      - postgres
     environment:
-      SPRING_DATASOURCE_URL: 
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vitalid_db
       SPRING_DATASOURCE_USERNAME: vitalid_user
       SPRING_DATASOURCE_PASSWORD: vitalid_password
-      SPRING_PROFILES_ACTIVE: dev
     ports:
       - "8080:8080"
-    restart: unless-stopped
+    networks:
+      - vitalid-network
+
+volumes:
+  vitalid_postgres_data:
+
+networks:
+  vitalid-network:
+    driver: bridge

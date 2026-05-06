@@ -94,3 +94,4 @@ public class PatientController {
         return ApiResponse.ok("Patients retrieved successfully", patients);
     }
 }
+

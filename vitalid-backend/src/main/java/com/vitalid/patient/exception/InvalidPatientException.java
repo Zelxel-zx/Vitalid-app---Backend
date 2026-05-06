@@ -13,3 +13,4 @@ public class InvalidPatientException extends RuntimeException {
         super(message, cause);
     }
 }
+

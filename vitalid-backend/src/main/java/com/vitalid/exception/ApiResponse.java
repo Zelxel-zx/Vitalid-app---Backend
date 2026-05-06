@@ -1,6 +1,5 @@
 package com.vitalid.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
  * Used for all success responses from the API
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ApiResponse<T> {
     private boolean success;
@@ -37,3 +35,4 @@ public class ApiResponse<T> {
         return new ApiResponse<>(false, message, null);
     }
 }
+

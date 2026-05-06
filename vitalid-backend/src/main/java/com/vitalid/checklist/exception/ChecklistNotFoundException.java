@@ -13,3 +13,4 @@ public class ChecklistNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

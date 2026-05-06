@@ -13,3 +13,4 @@ public class InvalidHealthDataException extends RuntimeException {
         super(message, cause);
     }
 }
+

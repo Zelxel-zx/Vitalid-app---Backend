@@ -1,6 +1,5 @@
 package com.vitalid.patient.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
  * Used for returning patient data in API responses
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class PatientResponse {
 
@@ -32,3 +30,4 @@ public class PatientResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

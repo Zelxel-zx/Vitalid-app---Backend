@@ -19,3 +19,4 @@ public interface ProfileRepository extends JpaRepository<User, Integer> {
     // TODO: Add custom query methods if needed
 
 }
+

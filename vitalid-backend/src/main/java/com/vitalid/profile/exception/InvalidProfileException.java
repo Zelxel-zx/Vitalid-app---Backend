@@ -13,3 +13,4 @@ public class InvalidProfileException extends RuntimeException {
         super(message, cause);
     }
 }
+

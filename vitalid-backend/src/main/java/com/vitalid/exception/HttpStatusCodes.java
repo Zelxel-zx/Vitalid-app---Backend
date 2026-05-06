@@ -31,3 +31,4 @@ public class HttpStatusCodes {
     public static final String VALIDATION_ERROR = "Validation failed";
 
 }
+

@@ -13,3 +13,4 @@ public class AppointmentNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

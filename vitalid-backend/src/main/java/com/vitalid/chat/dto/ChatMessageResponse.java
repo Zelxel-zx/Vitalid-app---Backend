@@ -1,6 +1,5 @@
 package com.vitalid.chat.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,10 +13,10 @@ import lombok.NoArgsConstructor;
  * - timestamp (when message was sent)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageResponse {
 
     // TODO: Add properties
 
 }
+

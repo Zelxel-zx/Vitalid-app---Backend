@@ -13,3 +13,4 @@ public class InvalidAppointmentException extends RuntimeException {
         super(message, cause);
     }
 }
+

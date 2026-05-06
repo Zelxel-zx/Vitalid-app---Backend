@@ -1,6 +1,5 @@
 package com.vitalid.checklist.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,10 +13,10 @@ import lombok.NoArgsConstructor;
  * - percentage (adherence percentage for that date)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class AdherenceResponse {
 
     // TODO: Add properties
 
 }
+

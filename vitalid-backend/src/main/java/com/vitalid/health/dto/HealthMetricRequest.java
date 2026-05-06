@@ -1,6 +1,5 @@
 package com.vitalid.health.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,10 +12,10 @@ import lombok.NoArgsConstructor;
  * - timestamp (when measurement was taken)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class HealthMetricRequest {
 
     // TODO: Add properties
 
 }
+

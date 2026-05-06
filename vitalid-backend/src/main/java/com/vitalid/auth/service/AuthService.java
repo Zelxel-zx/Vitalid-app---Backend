@@ -103,3 +103,4 @@ public class AuthService {
         // Se configura en el frontend eliminando el token del almacenamiento local
     }
 }
+

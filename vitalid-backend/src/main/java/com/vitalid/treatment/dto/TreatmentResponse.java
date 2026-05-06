@@ -1,6 +1,5 @@
 package com.vitalid.treatment.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
@@ -18,10 +17,10 @@ import java.util.List;
  * - medications (list of medication names/IDs)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class TreatmentResponse {
 
     // TODO: Add properties
 
 }
+

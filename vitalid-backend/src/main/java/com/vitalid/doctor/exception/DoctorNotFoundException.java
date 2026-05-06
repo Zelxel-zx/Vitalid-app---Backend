@@ -13,3 +13,4 @@ public class DoctorNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

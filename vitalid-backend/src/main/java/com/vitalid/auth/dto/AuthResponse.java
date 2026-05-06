@@ -1,9 +1,12 @@
 package com.vitalid.auth.dto;
 
+
 import com.vitalid.auth.entity.UserType;
+
 
 public record AuthResponse(
     // TODO: Add properties
+ feat/API-User
     Long id,
     String name,
     String email,
@@ -11,3 +14,4 @@ public record AuthResponse(
     String token,
     String message
 ) {}
+

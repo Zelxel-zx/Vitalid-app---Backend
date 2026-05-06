@@ -3,22 +3,16 @@ package com.vitalid.checklist.repository;
 import com.vitalid.checklist.entity.Checklist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
  * Checklist Repository
  * Data access for Checklist entity
- * 
- * TODO: Implement query methods:
- * - findByPatientId(String patientId)
- * - findByMedicationId(String medicationId)
- * - findByPatientIdAndCreatedDate(String patientId, LocalDate date)
- * - findTodayChecklistByPatientId(String patientId)
  */
 @Repository
-public interface ChecklistRepository extends JpaRepository<Checklist, String> {
+public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
 
-    // TODO: Add custom query methods
-
+    List<Checklist> findByPatientId(Long patientId);
+    List<Checklist> findByMedicationId(Long medicationId);
 }
+

@@ -8,16 +8,10 @@ import java.util.List;
 /**
  * Medication Repository
  * Data access for Medication entity
- * 
- * TODO: Implement query methods:
- * - findByPatientId(String patientId)
- * - findByDoctorId(Integer doctorId)
- * - findActiveByPatientId(String patientId)
- * - findByPatientIdAndEndDateIsNull(String patientId)
  */
 @Repository
-public interface MedicationRepository extends JpaRepository<Medication, String> {
+public interface MedicationRepository extends JpaRepository<Medication, Long> {
 
-    // TODO: Add custom query methods
-
+    List<Medication> findByPatientId(Long patientId);
 }
+

@@ -1,36 +1,63 @@
 package com.vitalid.appointment.entity;
 
+import com.vitalid.doctor.entity.Doctor;
+import com.vitalid.patient.entity.Patient;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 /**
  * Appointment Entity
  * Represents a medical appointment between patient and doctor
- * 
- * TODO: Implement appointment entity with:
- * - id (auto-generated)
- * - patientId (foreign key)
- * - doctorId (foreign key)
- * - date
- * - time
- * - reason
- * - status (SCHEDULED, COMPLETED, CANCELLED, NO_SHOW)
- * - createdAt
- * - updatedAt
- * - relationship to patient
- * - relationship to doctor
  */
 @Entity
 @Table(name = "appointments")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Appointment {
 
-    // TODO: Add entity properties and annotations
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "patient_id", nullable = false)
+    private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "doctor_id", nullable = false)
+    private Doctor doctor;
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    @Column(nullable = false)
+    private LocalTime time;
+
+    @Column(length = 255)
+    private String reason;
+
+    @Column(length = 30)
+    private String status = "SCHEDULED";
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
+

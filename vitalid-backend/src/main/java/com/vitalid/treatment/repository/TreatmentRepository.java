@@ -8,17 +8,12 @@ import java.util.List;
 /**
  * Treatment Repository
  * Data access for Treatment entity
- * 
- * TODO: Implement query methods:
- * - findByPatientId(String patientId)
- * - findByDoctorId(Integer doctorId)
- * - findByStatus(String status)
- * - findByPatientIdAndStatus(String patientId, String status)
- * - findAllByStatusOrderByCreatedAtDesc(String status)
  */
 @Repository
-public interface TreatmentRepository extends JpaRepository<Treatment, String> {
+public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
 
-    // TODO: Add custom query methods
-
+    List<Treatment> findByPatientId(Long patientId);
+    List<Treatment> findByDoctorId(Long doctorId);
+    List<Treatment> findByStatus(String status);
 }
+

@@ -6,26 +6,14 @@ import com.vitalid.auth.dto.LoginRequest;
 import com.vitalid.auth.dto.RegisterRequest;
 import com.vitalid.auth.dto.AuthResponse;
 import com.vitalid.auth.entity.User;
-import com.vitalid.auth.entity.UserType;
 import com.vitalid.auth.exception.InvalidCredentialsException;
 import com.vitalid.auth.repository.UserRepository;
 import com.vitalid.security.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
-/**
- * Authentication Service
- * Handles user registration and login
- * 
- * TODO: Implement methods:
- * - register(RegisterRequest) -> AuthResponse
- * - login(LoginRequest) -> AuthResponse
- * - logout()
- * - refreshToken(String token) -> String
- * - validateToken(String token) -> boolean
- */
+
 @Service
 public class AuthService {
 
-    // TODO: Implement authentication business logic
     @Autowired
     private UserRepository userRepository;
     

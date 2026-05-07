@@ -93,12 +93,22 @@ public class AuthService {
     // 4. Refrescar token
     public String refreshToken(String token) {
         // Generar nuevo token
+        System.out.println("DEBUG: Starting refreshToken with token: " + token.substring(0, 20) + "...");
+        
         if(validateToken(token)) {
+            System.out.println("DEBUG: Token is valid");
             String email = jwtTokenProvider.getEmailFromToken(token);
+            System.out.println("DEBUG: Email extracted from token: " + email);
+            
             User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
-            return jwtTokenProvider.generateToken(user.getEmail());
+            System.out.println("DEBUG: User found: " + user.getEmail());
+            
+            String newToken = jwtTokenProvider.generateToken(user.getEmail());
+            System.out.println("DEBUG: New token generated successfully");
+            return newToken;
         }
+        System.out.println("DEBUG: Token validation failed");
         throw new InvalidCredentialsException("Invalid token");
     }
     public void logout() {

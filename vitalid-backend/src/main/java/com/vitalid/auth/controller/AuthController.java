@@ -60,11 +60,11 @@ public class AuthController {
     })
     public ResponseEntity<ApiResponse<String>> refreshToken(
     @Parameter(name = "Authorization", description = "JWT Token en formato: Bearer {token}", required = true, example = "Bearer eyJhbGciOiJIUzI1NiJ9...")
-    @RequestHeader("Authorization") String authHeader) {
+    @RequestHeader(value = "Authorization", required = false) String authHeader) {
     
         // Validar que el header exista
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new InvalidCredentialsException("Token no proporcionado");
+        if (authHeader == null || authHeader.trim().isEmpty() || !authHeader.startsWith("Bearer ")) {
+            throw new InvalidCredentialsException("Token no proporcionado o formato inválido");
         }
         
         // Extraer token (elimina "Bearer ")
@@ -85,10 +85,10 @@ public class AuthController {
     @Operation(summary = "Verificar Token JWT", description = "Verifica si el token JWT es válido")
     public ResponseEntity<ApiResponse<Boolean>> verifyToken(
     @Parameter(name = "Authorization", description = "JWT Token en formato: Bearer {token}", required = true, example = "Bearer eyJhbGciOiJIUzI1NiJ9...")
-    @RequestHeader("Authorization") String authHeader) {
+    @RequestHeader(value = "Authorization", required = false) String authHeader) {
     
         // Validar que el header exista
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || authHeader.trim().isEmpty() || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.ok(ApiResponse.ok(false));
         }
         

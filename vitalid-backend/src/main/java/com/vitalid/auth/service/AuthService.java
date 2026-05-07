@@ -41,19 +41,19 @@ public class AuthService {
             // Guardar en la base de datos
             // Generar token JWT
             // Retornar AuthResponse con datos del usuario y token
-        if(userRepository.existsByEmail(request.getEmail())) {
+        if(userRepository.existsByEmail(request.email())) {
             throw new InvalidCredentialsException("El email ya está registrado");
         }
         User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setName(request.getName());
-        user.setPhone(request.getPhone());
-        user.setType(request.getType());
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setName(request.name());
+        user.setPhone(request.phone());
+        user.setType(request.type());
 
         userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user.getEmail());
         return new AuthResponse(
             user.getId(), 
             user.getName(), 
@@ -64,14 +64,14 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new InvalidCredentialsException());
+        User user = userRepository.findByEmail(request.email())
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
         
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user.getEmail());
         
         return new AuthResponse(
             user.getId(), 
@@ -95,7 +95,7 @@ public class AuthService {
             String email = jwtTokenProvider.getEmailFromToken(token);
             User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
-            return jwtTokenProvider.generateToken(user);
+            return jwtTokenProvider.generateToken(user.getEmail());
         }
         throw new InvalidCredentialsException("Invalid token");
     }

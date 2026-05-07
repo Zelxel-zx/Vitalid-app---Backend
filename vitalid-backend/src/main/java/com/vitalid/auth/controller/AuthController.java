@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import com.vitalid.auth.dto.AuthResponse;
 import com.vitalid.auth.dto.LoginRequest;
@@ -47,7 +52,14 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
+    @Operation(summary = "Refrescar Token JWT", description = "Genera un nuevo JWT token usando el token actual. Requiere enviar el token en el header Authorization con formato: Bearer {token}")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Token refrescado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Token no proporcionado o inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     public ResponseEntity<ApiResponse<String>> refreshToken(
+    @Parameter(name = "Authorization", description = "JWT Token en formato: Bearer {token}", required = true, example = "Bearer eyJhbGciOiJIUzI1NiJ9...")
     @RequestHeader("Authorization") String authHeader) {
     
         // Validar que el header exista
@@ -70,7 +82,9 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
+    @Operation(summary = "Verificar Token JWT", description = "Verifica si el token JWT es válido")
     public ResponseEntity<ApiResponse<Boolean>> verifyToken(
+    @Parameter(name = "Authorization", description = "JWT Token en formato: Bearer {token}", required = true, example = "Bearer eyJhbGciOiJIUzI1NiJ9...")
     @RequestHeader("Authorization") String authHeader) {
     
         // Validar que el header exista

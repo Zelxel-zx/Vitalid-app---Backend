@@ -38,61 +38,21 @@ public class ChatController {
 
     @GetMapping("/doctor/{doctorId}")
     public List<ChatMessageResponse> getMessagesForDoctor(@PathVariable Long doctorId) {
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
-        Long doctorUserId = doctor.getUser().getId();
-        return messageRepository.findBySenderIdOrReceiverIdOrderBySentAtAsc(doctorUserId, doctorUserId).stream()
-                .map(this::toResponse)
-                .toList();
     }
 
     @PostMapping("/send")
     public ResponseEntity<ChatMessageResponse> sendMessage(@RequestBody SendMessageRequest request) {
-        User sender = userRepository.findById(request.senderId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
-        Doctor doctor = doctorRepository.findById(request.doctorId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
-
-        Message message = new Message();
-        message.setSender(sender);
-        message.setReceiver(doctor.getUser());
-        message.setContent(request.content());
-        message.setIsRead(false);
-        message.setSentAt(LocalDateTime.now());
-
-        ChatMessageResponse response = toResponse(messageRepository.save(message));
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/unread")
     public List<UnreadResponse> getUnreadMessages() {
-        return doctorRepository.findAll().stream()
-                .map(doctor -> new UnreadResponse(
-                        doctor.getId(),
-                        messageRepository.countByReceiverIdAndIsReadFalse(doctor.getUser().getId())
-                ))
-                .toList();
     }
 
     @PutMapping("/read/{doctorId}")
     public ResponseEntity<MessageResponse> markRead(@PathVariable Long doctorId) {
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
-        Long doctorUserId = doctor.getUser().getId();
-        messageRepository.findByReceiverIdAndIsReadFalse(doctorUserId).forEach(message -> {
-            message.setIsRead(true);
-            messageRepository.save(message);
-        });
-        return ResponseEntity.ok(new MessageResponse("Messages marked as read"));
     }
 
     private ChatMessageResponse toResponse(Message message) {
-        return new ChatMessageResponse(
-                message.getId(),
-                message.getSender().getName(),
-                message.getContent(),
-                message.getSentAt().toString()
-        );
     }
 
     public record SendMessageRequest(Long doctorId, Long senderId, String content) {

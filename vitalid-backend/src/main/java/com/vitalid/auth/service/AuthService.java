@@ -68,7 +68,7 @@ public class AuthService {
             .orElseThrow(() -> new InvalidCredentialsException());
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException();
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         String token = jwtTokenProvider.generateToken(user);
@@ -94,10 +94,10 @@ public class AuthService {
         if(validateToken(token)) {
             String email = jwtTokenProvider.getEmailFromToken(token);
             User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new InvalidCredentialsException());
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
             return jwtTokenProvider.generateToken(user);
         }
-        throw new InvalidCredentialsException();
+        throw new InvalidCredentialsException("Invalid token");
     }
     public void logout() {
         // Se configura en el frontend eliminando el token del almacenamiento local

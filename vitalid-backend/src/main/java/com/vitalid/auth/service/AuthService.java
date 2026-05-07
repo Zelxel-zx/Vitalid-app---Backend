@@ -59,6 +59,7 @@ public class AuthService {
             user.getName(), 
             user.getEmail(), 
             user.getType(), 
+            user.getCreatedAt(),
             token, 
             "Usuario registrado exitosamente");  
     }
@@ -78,6 +79,7 @@ public class AuthService {
             user.getName(), 
             user.getEmail(), 
             user.getType(), 
+            user.getCreatedAt(),
             token, 
             "Inicio de sesión exitoso");
     }

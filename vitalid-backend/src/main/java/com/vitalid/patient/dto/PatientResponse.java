@@ -1,5 +1,4 @@
 package com.vitalid.patient.dto;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -17,4 +16,3 @@ public record PatientResponse(
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}
-

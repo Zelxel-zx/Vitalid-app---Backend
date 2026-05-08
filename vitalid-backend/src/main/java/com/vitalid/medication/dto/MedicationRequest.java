@@ -1,6 +1,5 @@
 package com.vitalid.medication.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,10 +15,10 @@ import lombok.NoArgsConstructor;
  * - endDate
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class MedicationRequest {
 
     // TODO: Add properties
 
 }
+

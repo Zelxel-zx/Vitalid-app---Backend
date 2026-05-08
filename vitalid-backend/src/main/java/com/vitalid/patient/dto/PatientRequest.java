@@ -1,5 +1,4 @@
 package com.vitalid.patient.dto;
-
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 

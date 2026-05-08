@@ -1,6 +1,5 @@
 package com.vitalid.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
  * Used for all error responses from the API
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ErrorResponse {
     private String message;
@@ -35,3 +33,4 @@ public class ErrorResponse {
         this.timestamp = LocalDateTime.now();
     }
 }
+

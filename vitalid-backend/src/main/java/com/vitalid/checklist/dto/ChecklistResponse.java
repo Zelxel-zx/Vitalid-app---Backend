@@ -1,6 +1,5 @@
 package com.vitalid.checklist.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
@@ -19,10 +18,10 @@ import java.util.List;
  *   - actualTime
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ChecklistResponse {
 
     // TODO: Add properties
 
 }
+

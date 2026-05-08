@@ -13,3 +13,4 @@ public class InvalidMedicationException extends RuntimeException {
         super(message, cause);
     }
 }
+

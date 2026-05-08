@@ -1,6 +1,5 @@
 package com.vitalid.profile.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
@@ -21,10 +20,10 @@ import java.util.List;
  * - specialty (for doctors)
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ProfileResponse {
 
     // TODO: Add properties
 
 }
+

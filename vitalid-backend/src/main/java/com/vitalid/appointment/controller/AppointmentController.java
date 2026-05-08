@@ -1,7 +1,18 @@
 package com.vitalid.appointment.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import com.vitalid.appointment.entity.Appointment;
+import com.vitalid.appointment.repository.AppointmentRepository;
+import com.vitalid.doctor.repository.DoctorRepository;
+import com.vitalid.patient.repository.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Appointment Controller
@@ -11,13 +22,78 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/appointments")
 public class AppointmentController {
 
-    // TODO: Implement appointment endpoints
-    // GET /api/appointments - List appointments
-    // GET /api/appointments/{id} - Get appointment details
-    // POST /api/appointments - Schedule new appointment
-    // PUT /api/appointments/{id} - Update appointment
-    // DELETE /api/appointments/{id} - Cancel appointment
-    // GET /api/appointments/doctor/{doctorId} - Get doctor appointments
-    // GET /api/appointments/patient/{patientId} - Get patient appointments
+    private final AppointmentRepository appointmentRepository;
+    private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
 
+    @Autowired
+    public AppointmentController(AppointmentRepository appointmentRepository,
+                                 PatientRepository patientRepository,
+                                 DoctorRepository doctorRepository) {
+        this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
+        this.doctorRepository = doctorRepository;
+    }
+
+    @PostMapping
+    public ResponseEntity<AppointmentResponse> createAppointment(@RequestBody AppointmentRequest request) {
+        var patient = patientRepository.findById(request.patientId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+        var doctor = doctorRepository.findById(request.doctorId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
+
+        Appointment appointment = new Appointment();
+        appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setDate(request.date());
+        appointment.setTime(request.time());
+        appointment.setReason(request.reason());
+        appointment.setStatus("SCHEDULED");
+
+        Appointment saved = appointmentRepository.save(appointment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(saved));
+    }
+
+    @GetMapping
+    public List<AppointmentResponse> listAppointments() {
+        return appointmentRepository.findAll().stream().map(this::toResponse).toList();
+    }
+
+    @GetMapping("/{id}")
+    public AppointmentResponse getAppointment(@PathVariable Long id) {
+        return appointmentRepository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found"));
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public List<AppointmentResponse> getAppointmentsForDoctor(@PathVariable Long doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId).stream().map(this::toResponse).toList();
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<AppointmentResponse> getAppointmentsForPatient(@PathVariable Long patientId) {
+        return appointmentRepository.findByPatientId(patientId).stream().map(this::toResponse).toList();
+    }
+
+    private AppointmentResponse toResponse(Appointment appointment) {
+        return new AppointmentResponse(
+                appointment.getId(),
+                appointment.getPatient().getId(),
+                appointment.getDoctor().getId(),
+                appointment.getPatient().getUser().getName(),
+                appointment.getDoctor().getUser().getName(),
+                appointment.getDate(),
+                appointment.getTime(),
+                appointment.getReason(),
+                appointment.getStatus()
+        );
+    }
+
+    public record AppointmentRequest(Long patientId, Long doctorId, LocalDate date, LocalTime time, String reason) {
+    }
+
+    public record AppointmentResponse(Long id, Long patientId, Long doctorId, String patientName, String doctorName, LocalDate date, LocalTime time, String reason, String status) {
+    }
 }
+

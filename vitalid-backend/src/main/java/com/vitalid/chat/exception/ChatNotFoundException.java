@@ -13,3 +13,4 @@ public class ChatNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

@@ -1,33 +1,56 @@
 package com.vitalid.checklist.entity;
 
+import com.vitalid.medication.entity.Medication;
+import com.vitalid.patient.entity.Patient;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * Checklist Entity
  * Represents a medication adherence checklist for a patient
- * 
- * TODO: Implement checklist entity with:
- * - id (auto-generated)
- * - patientId (foreign key)
- * - medicationId (foreign key)
- * - createdDate
- * - updatedDate
- * - relationship to medications
- * - relationship to scheduled times
- * - relationship to dosage records
  */
 @Entity
 @Table(name = "checklists")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Checklist {
 
-    // TODO: Add entity properties and annotations
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "patient_id", nullable = false)
+    private Patient patient;
+
+    @ManyToOne
+    @JoinColumn(name = "medication_id", nullable = false)
+    private Medication medication;
+
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduledTime> scheduledTimes;
+
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DosageRecord> dosageRecords;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
+

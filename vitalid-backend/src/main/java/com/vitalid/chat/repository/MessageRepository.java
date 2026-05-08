@@ -8,16 +8,13 @@ import java.util.List;
 /**
  * Message Repository
  * Data access for Message entity
- * 
- * TODO: Implement query methods:
- * - findBySenderIdAndReceiverId(Integer senderId, Integer receiverId)
- * - findUnreadMessagesByReceiverId(Integer receiverId)
- * - findByIsReadFalseAndReceiverId(Integer receiverId)
- * - countUnreadByReceiverId(Integer receiverId)
  */
 @Repository
-public interface MessageRepository extends JpaRepository<Message, String> {
+public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    // TODO: Add custom query methods
-
+    List<Message> findBySenderIdAndReceiverId(Long senderId, Long receiverId);
+    List<Message> findByReceiverIdAndIsReadFalse(Long receiverId);
+    long countByReceiverIdAndIsReadFalse(Long receiverId);
+    List<Message> findBySenderIdOrReceiverIdOrderBySentAtAsc(Long senderId, Long receiverId);
 }
+

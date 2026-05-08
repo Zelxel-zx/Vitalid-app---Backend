@@ -1,7 +1,9 @@
 package com.vitalid.auth.dto;
 
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import com.vitalid.auth.entity.UserType;
 
@@ -24,6 +26,8 @@ public record RegisterRequest(
     @Size(max = 20, message = "Teléfono debe tener como máximo 20 caracteres")
     String phone,
 
-    @NotBlank(message = "Tipo es obligatorio")
+    @NotNull(message = "Tipo es obligatorio")
     UserType type
 ) {}
+
+

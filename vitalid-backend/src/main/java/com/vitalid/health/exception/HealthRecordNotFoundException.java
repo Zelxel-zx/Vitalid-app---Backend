@@ -13,3 +13,4 @@ public class HealthRecordNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

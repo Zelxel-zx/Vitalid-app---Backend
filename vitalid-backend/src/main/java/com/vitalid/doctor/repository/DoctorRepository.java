@@ -8,16 +8,12 @@ import java.util.List;
 /**
  * Doctor Repository
  * Data access for Doctor entity
- * 
- * TODO: Implement query methods:
- * - findBySpecialty(String specialty)
- * - findByStatus(String status)
- * - findByUserId(Integer userId)
- * - findAllByOrderByNameAsc()
  */
 @Repository
-public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
+public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    // TODO: Add custom query methods
-
+    List<Doctor> findBySpecialtyIgnoreCase(String specialty);
+    List<Doctor> findByStatus(String status);
+    List<Doctor> findAllByOrderByIdAsc();
 }
+

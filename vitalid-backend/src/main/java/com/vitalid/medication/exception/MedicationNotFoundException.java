@@ -13,3 +13,4 @@ public class MedicationNotFoundException extends RuntimeException {
         super(message, cause);
     }
 }
+

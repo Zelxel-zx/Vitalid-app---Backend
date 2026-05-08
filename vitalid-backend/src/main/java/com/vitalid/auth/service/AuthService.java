@@ -8,7 +8,6 @@ import com.vitalid.auth.dto.LoginRequest;
 import com.vitalid.auth.dto.RegisterRequest;
 import com.vitalid.auth.dto.AuthResponse;
 import com.vitalid.auth.entity.User;
-import com.vitalid.auth.entity.UserType;
 import com.vitalid.auth.exception.InvalidCredentialsException;
 import com.vitalid.auth.repository.UserRepository;
 import com.vitalid.exception.ResourceNotFoundException;
@@ -16,22 +15,9 @@ import com.vitalid.patient.dto.PatientResponse;
 import com.vitalid.patient.entity.Patient;
 import com.vitalid.security.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import java.util.List;
-/**
- * Authentication Service
- * Handles user registration and login
- * 
- * TODO: Implement methods:
- * - register(RegisterRequest) -> AuthResponse
- * - login(LoginRequest) -> AuthResponse
- * - logout()
- * - refreshToken(String token) -> String
- * - validateToken(String token) -> boolean
- */
 @Service
 public class AuthService {
 
-    // TODO: Implement authentication business logic
     @Autowired
     private UserRepository userRepository;
     
@@ -47,43 +33,45 @@ public class AuthService {
             // Guardar en la base de datos
             // Generar token JWT
             // Retornar AuthResponse con datos del usuario y token
-        if(userRepository.existsByEmail(request.getEmail())) {
+        if(userRepository.existsByEmail(request.email())) {
             throw new InvalidCredentialsException("El email ya está registrado");
         }
         User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setName(request.getName());
-        user.setPhone(request.getPhone());
-        user.setType(request.getType());
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setName(request.name());
+        user.setPhone(request.phone());
+        user.setType(request.type());
 
         userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user.getEmail());
         return new AuthResponse(
             user.getId(), 
             user.getName(), 
             user.getEmail(), 
             user.getType(), 
+            user.getCreatedAt(),
             token, 
             "Usuario registrado exitosamente");  
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new InvalidCredentialsException());
+        User user = userRepository.findByEmail(request.email())
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
         
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException();
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
-        String token = jwtTokenProvider.generateToken(user);
+        String token = jwtTokenProvider.generateToken(user.getEmail());
         
         return new AuthResponse(
             user.getId(), 
             user.getName(), 
             user.getEmail(), 
             user.getType(), 
+            user.getCreatedAt(),
             token, 
             "Inicio de sesión exitoso");
     }
@@ -97,13 +85,23 @@ public class AuthService {
     // 4. Refrescar token
     public String refreshToken(String token) {
         // Generar nuevo token
+        System.out.println("DEBUG: Starting refreshToken with token: " + token.substring(0, 20) + "...");
+        
         if(validateToken(token)) {
+            System.out.println("DEBUG: Token is valid");
             String email = jwtTokenProvider.getEmailFromToken(token);
+            System.out.println("DEBUG: Email extracted from token: " + email);
+            
             User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new InvalidCredentialsException());
-            return jwtTokenProvider.generateToken(user);
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+            System.out.println("DEBUG: User found: " + user.getEmail());
+            
+            String newToken = jwtTokenProvider.generateToken(user.getEmail());
+            System.out.println("DEBUG: New token generated successfully");
+            return newToken;
         }
-        throw new InvalidCredentialsException();
+        System.out.println("DEBUG: Token validation failed");
+        throw new InvalidCredentialsException("Invalid token");
     }
     public void logout() {
         // Se configura en el frontend eliminando el token del almacenamiento local
@@ -149,3 +147,4 @@ public class AuthService {
                 .collect(Collectors.toList());
     }
 }
+

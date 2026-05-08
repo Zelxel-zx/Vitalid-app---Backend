@@ -25,3 +25,4 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
 
     List<Patient> findByZipCode(String zipCode);
 }
+

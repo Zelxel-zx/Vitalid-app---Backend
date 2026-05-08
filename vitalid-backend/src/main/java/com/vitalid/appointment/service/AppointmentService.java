@@ -24,3 +24,4 @@ public class AppointmentService {
     // TODO: Implement appointment business logic
 
 }
+

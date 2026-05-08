@@ -1,22 +1,20 @@
 package com.vitalid.chat.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-/**
+/*
  * Chat Controller
  * Handles messaging between patients and doctors
+ * Routes: /api/chat, /api/messages
+ * 
+ * Endpoints:
+ * GET  /api/chat/doctor/{doctorId} - Get messages for a specific doctor
+ * POST /api/chat/send - Send a message from a user to a doctor
+ * GET  /api/chat/unread - Get unread message count for all doctors
+ * PUT  /api/chat/read/{doctorId} - Mark messages as read for a doctor
+ * 
+ * Records:
+ * - SendMessageRequest(Long doctorId, Long senderId, String content)
+ * - ChatMessageResponse(Long id, String sender, String content, String timestamp)
+ * - UnreadResponse(Long doctorId, long unreadCount)
+ * - MessageResponse(String message)
  */
-@RestController
-@RequestMapping("/api/messages")
-public class ChatController {
 
-    // TODO: Implement chat/messaging endpoints
-    // GET /api/messages/{conversationId} - Get conversation messages
-    // POST /api/messages - Send new message
-    // PUT /api/messages/{id} - Edit message
-    // DELETE /api/messages/{id} - Delete message
-    // GET /api/conversations - List user conversations
-    // GET /api/conversations/{id} - Get conversation details
-
-}

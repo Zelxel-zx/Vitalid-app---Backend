@@ -50,6 +50,7 @@ public class PatientService {
 
         Patient patient = new Patient();
         patient.setId(userId);
+        patient.setType(UserType.PATIENT);
         patient.setDateOfBirth(request.getDateOfBirth());
         patient.setBloodType(request.getBloodType());
         patient.setMedicalHistory(request.getMedicalHistory());

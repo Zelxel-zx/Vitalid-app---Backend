@@ -11,12 +11,10 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-@Entity
 @Table(name = "patients")
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@Entity
 @PrimaryKeyJoinColumn(name = "user_id")
 public class Patient extends User {
 

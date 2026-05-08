@@ -1,7 +1,7 @@
 package com.vitalid.auth.service;
 
 import java.util.stream.Collectors;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vitalid.auth.dto.LoginRequest;
@@ -112,17 +112,17 @@ public class AuthService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         
-        if (request.getEmail() != null) {
-            user.setEmail(request.getEmail());
+        if (request.email() != null) {
+            user.setEmail(request.email());
         }
-        if (request.getPhone() != null) {
-            user.setPhone(request.getPhone());
+        if (request.phone() != null) {
+            user.setPhone(request.phone());
         }
-        if (request.getName() != null) {
-            user.setName(request.getName());
+        if (request.name() != null) {
+            user.setName(request.name());
         }
-        if (request.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (request.password() != null) {
+            user.setPassword(passwordEncoder.encode(request.password()));
         }
         
         User updatedUser = userRepository.save(user);
@@ -135,7 +135,8 @@ public class AuthService {
             user.getName(),
             user.getEmail(),
             user.getType(),
-            jwtTokenProvider.generateToken(user),
+            user.getCreatedAt(),
+            jwtTokenProvider.generateToken(user.getEmail()),
             "Operación exitosa"
         );
     }

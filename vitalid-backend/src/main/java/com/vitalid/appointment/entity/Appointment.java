@@ -4,7 +4,10 @@ import com.vitalid.doctor.entity.Doctor;
 import com.vitalid.patient.entity.Patient;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
@@ -12,7 +15,9 @@ import java.time.LocalDateTime;
 /**
  * Appointment Entity
  * Represents a medical appointment between patient and doctor
- */
+*/
+@Getter
+@Setter
 @Entity
 @Table(name = "appointments")
 @Data

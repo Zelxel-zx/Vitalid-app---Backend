@@ -1,5 +1,4 @@
 package com.vitalid.patient.service;
-
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vitalid.patient.entity.Patient;
@@ -87,8 +86,8 @@ public class PatientService {
                 patient.setBloodType(request.bloodType());
             }
             
-            if (request.DateOfBirth() != null) {
-                patient.setDateOfBirth(request.getDateOfBirth());
+            if (request.dateOfBirth() != null) {
+                patient.setDateOfBirth(request.dateOfBirth());
             }
             if (request.zipCode() != null) {
                 patient.setZipCode(request.zipCode());
@@ -96,8 +95,8 @@ public class PatientService {
             if (request.medicalHistory() != null) {
                 patient.setMedicalHistory(request.medicalHistory());
             }
-            if (request.Allergies() != null) {
-                patient.setAllergies(request.Allergies());
+            if (request.allergies() != null) {
+                patient.setAllergies(request.allergies());
             }
         
         Patient updatedPatient = patientRepository.save(patient);
@@ -181,20 +180,5 @@ public class PatientService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Convert Patient entity to PatientResponse DTO
-     */
-    private PatientResponse toResponse(Patient patient) {
-        return new PatientResponse(
-            patient.getAddress(),
-            patient.getCity(),
-            patient.getState(),
-            patient.getZipCode(),
-            patient.getDateOfBirth(),
-            patient.getBloodType(),
-            patient.getMedicalHistory(),
-            patient.getAllergies()
-        );
-    }
 }
 

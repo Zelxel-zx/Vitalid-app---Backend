@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+@Getter
+@Setter
 public class User {
     
     @Id

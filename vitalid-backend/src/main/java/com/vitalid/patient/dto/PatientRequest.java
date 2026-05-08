@@ -1,27 +1,29 @@
 package com.vitalid.patient.dto;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 
 /**
  * Patient Request DTO
- * Used for creating and updating patient data
+ * Used for creating and updating patient-specific data
+ * (User fields like email, password, phone are inherited from User)
  */
-@Data
-@NoArgsConstructor
-public class PatientRequest {
-
-    private Long userId;
-    private LocalDate dateOfBirth;
-    private String bloodType;
-    private String phoneNumber;
-    private String address;
-    private String city;
-    private String state;
-    private String zipCode;
-    private String medicalHistory;
-    private String allergies;
-    private Boolean isActive;
-}
-
+public record PatientRequest(
+    
+    @NotNull(message = "Fecha de nacimiento es obligatoria")
+    LocalDate dateOfBirth,
+    
+    @Pattern(regexp = "^(O|A|B|AB)[+-]?$", message = "Tipo de sangre inválido (O, A, B, AB)")
+    String bloodType,
+    
+    String address,
+    
+    String city,
+    
+    String state,
+    
+    String zipCode,
+    
+    String medicalHistory,
+    
+    String allergies
+) {}

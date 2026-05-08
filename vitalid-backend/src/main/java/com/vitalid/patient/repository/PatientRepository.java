@@ -13,29 +13,16 @@ import java.util.List;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
-    /**
-     * Find a patient by user ID
-     */
     Optional<Patient> findByUserId(Long userId);
 
-    /**
-     * Find all active patients
-     */
-    List<Patient> findByIsActiveTrue();
-
-    /**
-     * Find patients by blood type
-     */
     List<Patient> findByBloodType(String bloodType);
 
-    /**
-     * Find patients by city
-     */
+    List<Patient> findByAllergiesContaining(String allergy);
+
     List<Patient> findByCity(String city);
 
-    /**
-     * Check if a patient exists for a user
-     */
-    boolean existsByUserId(Long userId);
+    List<Patient> findByState(String state);
+
+    List<Patient> findByZipCode(String zipCode);
 }
 

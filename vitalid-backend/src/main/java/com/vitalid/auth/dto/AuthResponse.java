@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 
 public record AuthResponse(
-    // TODO: Add properties
     Long id,
     String name,
     String email,

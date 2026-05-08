@@ -16,6 +16,14 @@ public record PatientRequest(
     @Pattern(regexp = "^(O|A|B|AB)[+-]?$", message = "Tipo de sangre inválido (O, A, B, AB)")
     String bloodType,
     
+    String address,
+    
+    String city,
+    
+    String state,
+    
+    String zipCode,
+    
     String medicalHistory,
     
     String allergies

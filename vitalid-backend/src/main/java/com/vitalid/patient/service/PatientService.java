@@ -9,6 +9,7 @@ import com.vitalid.patient.dto.PatientRequest;
 import com.vitalid.patient.exception.PatientNotFoundException;
 import com.vitalid.patient.exception.InvalidPatientException;
 import com.vitalid.auth.entity.User;
+import com.vitalid.auth.entity.UserType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,17 +45,21 @@ public class PatientService {
      * Note: Patient inherits from User, so User record must be created first via AuthService.register()
      */
     public PatientResponse createPatient(Long userId, PatientRequest request) {
-        if (request.getDateOfBirth() == null) {
+        if (request.dateOfBirth() == null) {
             throw new InvalidPatientException("Se requiere la fecha de nacimiento");
         }
 
         Patient patient = new Patient();
         patient.setId(userId);
         patient.setType(UserType.PATIENT);
-        patient.setDateOfBirth(request.getDateOfBirth());
-        patient.setBloodType(request.getBloodType());
-        patient.setMedicalHistory(request.getMedicalHistory());
-        patient.setAllergies(request.getAllergies());
+        patient.setDateOfBirth(request.dateOfBirth());
+        patient.setBloodType(request.bloodType());
+        patient.setAddress(request.address());
+        patient.setCity(request.city());
+        patient.setState(request.state());
+        patient.setZipCode(request.zipCode());
+        patient.setMedicalHistory(request.medicalHistory());
+        patient.setAllergies(request.allergies());
 
         Patient savedPatient = patientRepository.save(patient);
         return toResponse(savedPatient);
@@ -67,19 +72,34 @@ public class PatientService {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientNotFoundException("Paciente no encontrado con id: " + id));
 
-        if (request.getDateOfBirth() != null) {
-            patient.setDateOfBirth(request.getDateOfBirth());
-        }
-        if (request.getBloodType() != null) {
-            patient.setBloodType(request.getBloodType());
-        }
-        if (request.getMedicalHistory() != null) {
-            patient.setMedicalHistory(request.getMedicalHistory());
-        }
-        if (request.getAllergies() != null) {
-            patient.setAllergies(request.getAllergies());
-        }
+            if(request.address() != null) {
+                patient.setAddress(request.address());
+            }
 
+            if(request.city() != null) {
+                patient.setCity(request.city());
+            }
+            if(request.state() != null) {
+                patient.setState(request.state());
+            }
+
+            if(request.bloodType() != null) {
+                patient.setBloodType(request.bloodType());
+            }
+            
+            if (request.DateOfBirth() != null) {
+                patient.setDateOfBirth(request.getDateOfBirth());
+            }
+            if (request.zipCode() != null) {
+                patient.setZipCode(request.zipCode());
+            }
+            if (request.medicalHistory() != null) {
+                patient.setMedicalHistory(request.medicalHistory());
+            }
+            if (request.Allergies() != null) {
+                patient.setAllergies(request.Allergies());
+            }
+        
         Patient updatedPatient = patientRepository.save(patient);
         return toResponse(updatedPatient);
     }
@@ -94,6 +114,56 @@ public class PatientService {
         patientRepository.deleteById(id);
     }
 
+
+    /**
+     * Get patients by city
+     */
+    public List<PatientResponse> getPatientsByCity(String city) {
+        return patientRepository.findByCity(city)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Convert Patient entity to PatientResponse DTO
+     */
+    private PatientResponse toResponse(Patient patient) {
+        return new PatientResponse(
+            patient.getId(),
+            patient.getDateOfBirth(),
+            patient.getBloodType(),
+            patient.getAddress(),
+            patient.getCity(),
+            patient.getState(),
+            patient.getZipCode(),
+            patient.getMedicalHistory(),
+            patient.getAllergies(),
+            patient.getIsActive(),
+            patient.getCreatedAt(),
+            patient.getUpdatedAt()
+        );
+    }
+
+    /**
+     * Get patients by state
+     */
+    public List<PatientResponse> getPatientsByState(String state) {
+        return patientRepository.findByState(state)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get patients by zip code
+     */
+    public List<PatientResponse> getPatientsByZipCode(String zipCode) {
+        return patientRepository.findByZipCode(zipCode)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
     /**
      * Get patients by blood type
      */
@@ -116,6 +186,10 @@ public class PatientService {
      */
     private PatientResponse toResponse(Patient patient) {
         return new PatientResponse(
+            patient.getAddress(),
+            patient.getCity(),
+            patient.getState(),
+            patient.getZipCode(),
             patient.getDateOfBirth(),
             patient.getBloodType(),
             patient.getMedicalHistory(),
@@ -123,3 +197,4 @@ public class PatientService {
         );
     }
 }
+

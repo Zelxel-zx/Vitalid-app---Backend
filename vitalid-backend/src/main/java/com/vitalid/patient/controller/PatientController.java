@@ -93,4 +93,31 @@ public class PatientController {
         return ApiResponse.ok("Paciente recuperado exitosamente", patients);
     }
 
+    /**
+     * Get patients by city
+     */
+    @GetMapping("/filter/city/{city}")
+    public ApiResponse<List<PatientResponse>> getPatientsByCity(@PathVariable String city) {
+        List<PatientResponse> patients = patientService.getPatientsByCity(city);
+        return ApiResponse.ok("Pacientes por ciudad recuperados exitosamente", patients);
+    }
+
+    /**
+     * Get patients by state
+     */
+    @GetMapping("/filter/state/{state}")
+    public ApiResponse<List<PatientResponse>> getPatientsByState(@PathVariable String state) {
+        List<PatientResponse> patients = patientService.getPatientsByState(state);
+        return ApiResponse.ok("Pacientes por estado recuperados exitosamente", patients);
+    }
+
+    /**
+     * Get patients by zip code
+     */
+    @GetMapping("/filter/zipcode/{zipCode}")
+    public ApiResponse<List<PatientResponse>> getPatientsByZipCode(@PathVariable String zipCode) {
+        List<PatientResponse> patients = patientService.getPatientsByZipCode(zipCode);
+        return ApiResponse.ok("Pacientes por código postal recuperados exitosamente", patients);
+    }
+
 }

@@ -18,4 +18,10 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     List<Patient> findByBloodType(String bloodType);
 
     List<Patient> findByAllergiesContaining(String allergy);
+
+    List<Patient> findByCity(String city);
+
+    List<Patient> findByState(String state);
+
+    List<Patient> findByZipCode(String zipCode);
 }

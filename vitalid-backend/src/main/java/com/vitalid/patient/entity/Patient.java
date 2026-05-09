@@ -15,9 +15,16 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @Setter
 @Entity
-@PrimaryKeyJoinColumn(name = "user_id")
-public class Patient extends User {
+public class Patient{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
     @Column(nullable = false)
     private LocalDate dateOfBirth;
 

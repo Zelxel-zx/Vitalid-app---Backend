@@ -18,6 +18,7 @@ import com.vitalid.auth.dto.RegisterRequest;
 import com.vitalid.auth.service.AuthService;
 import com.vitalid.auth.exception.InvalidCredentialsException;
 import com.vitalid.exception.ApiResponse;
+import java.util.List;
 
 /**
  * Authentication Controller
@@ -106,6 +107,17 @@ public class AuthController {
         boolean isValid = authService.validateToken(token);
         
         return ResponseEntity.ok(ApiResponse.ok(isValid));
+    }
+
+    @GetMapping("/users")
+    @Operation(summary = "Obtener todos los usuarios", description = "Retorna la lista de todos los usuarios registrados en el sistema")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Usuarios obtenidos exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<ApiResponse<List<AuthResponse>>> getAllUsers() {
+        List<AuthResponse> users = authService.getAllUsers();
+        return ResponseEntity.ok(ApiResponse.ok("Usuarios obtenidos exitosamente", users));
     }
 
 }

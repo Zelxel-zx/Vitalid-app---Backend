@@ -9,7 +9,12 @@ import com.vitalid.patient.dto.PatientResponse;
 import com.vitalid.patient.dto.PatientRequest;
 import com.vitalid.exception.ApiResponse;
 import com.vitalid.auth.entity.User;
+import com.vitalid.auth.repository.UserRepository;
+import com.vitalid.exception.ResourceNotFoundException;
 import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 /**
  * Patient Controller
@@ -22,6 +27,9 @@ public class PatientController {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Get all patients
@@ -45,10 +53,30 @@ public class PatientController {
      * Create a new patient
      */
     @PostMapping
+    @Operation(summary = "Crear perfil de paciente", description = "Crea un nuevo perfil de paciente con los datos de salud. Requiere autenticación JWT.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Paciente creado exitosamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Datos inválidos"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "No autenticado"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     public ApiResponse<PatientResponse> createPatient(@RequestBody PatientRequest request) {
-        // Extract userId from JWT token in SecurityContext
+        // Extract email from JWT token in SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
+        
+        System.out.println("DEBUG: Email from token: " + email);
+        
+        // Get user from database using email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    System.out.println("DEBUG: User not found with email: " + email);
+                    return new ResourceNotFoundException("Usuario no encontrado con email: " + email);
+                });
+        
+        System.out.println("DEBUG: User found with id: " + user.getId());
+        
         Long userId = user.getId();
         
         PatientResponse patient = patientService.createPatient(userId, request);
@@ -111,14 +139,6 @@ public class PatientController {
         return ApiResponse.ok("Pacientes por estado recuperados exitosamente", patients);
     }
 
-    /**
-     * Get patients by zip code
-     */
-    @GetMapping("/filter/zipcode/{zipCode}")
-    public ApiResponse<List<PatientResponse>> getPatientsByZipCode(@PathVariable String zipCode) {
-        List<PatientResponse> patients = patientService.getPatientsByZipCode(zipCode);
-        return ApiResponse.ok("Pacientes por código postal recuperados exitosamente", patients);
-    }
 
 }
 

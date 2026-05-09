@@ -2,17 +2,23 @@ package com.vitalid.auth.service;
 
 import java.util.stream.Collectors;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vitalid.auth.dto.LoginRequest;
 import com.vitalid.auth.dto.RegisterRequest;
 import com.vitalid.auth.dto.AuthResponse;
 import com.vitalid.auth.entity.User;
+import com.vitalid.auth.entity.UserType;
 import com.vitalid.auth.exception.InvalidCredentialsException;
 import com.vitalid.auth.repository.UserRepository;
 import com.vitalid.exception.ResourceNotFoundException;
 import com.vitalid.patient.dto.PatientResponse;
 import com.vitalid.patient.entity.Patient;
+import com.vitalid.patient.repository.PatientRepository;
+import com.vitalid.doctor.entity.Doctor;
+import com.vitalid.doctor.repository.DoctorRepository;
 import com.vitalid.security.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 @Service
@@ -20,6 +26,12 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
     
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -43,15 +55,15 @@ public class AuthService {
         user.setPhone(request.phone());
         user.setType(request.type());
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(user.getEmail());
+        String token = jwtTokenProvider.generateToken(savedUser.getEmail());
         return new AuthResponse(
-            user.getId(), 
-            user.getName(), 
-            user.getEmail(), 
-            user.getType(), 
-            user.getCreatedAt(),
+            savedUser.getId(), 
+            savedUser.getName(), 
+            savedUser.getEmail(), 
+            savedUser.getType(), 
+            savedUser.getCreatedAt(),
             token, 
             "Usuario registrado exitosamente");  
     }

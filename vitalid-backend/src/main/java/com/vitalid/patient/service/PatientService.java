@@ -1,10 +1,12 @@
 package com.vitalid.patient.service;
+
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.vitalid.patient.entity.Patient;
 import com.vitalid.patient.repository.PatientRepository;
 import com.vitalid.patient.dto.PatientResponse;
 import com.vitalid.patient.dto.PatientRequest;
+import com.vitalid.auth.repository.UserRepository;
 import com.vitalid.patient.exception.PatientNotFoundException;
 import com.vitalid.patient.exception.InvalidPatientException;
 import com.vitalid.auth.entity.User;
@@ -19,6 +21,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class PatientService {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private PatientRepository patientRepository;
@@ -48,9 +53,11 @@ public class PatientService {
             throw new InvalidPatientException("Se requiere la fecha de nacimiento");
         }
 
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         Patient patient = new Patient();
-        patient.setId(userId);
-        patient.setType(UserType.PATIENT);
+        patient.setUser(user);
         patient.setDateOfBirth(request.dateOfBirth());
         patient.setBloodType(request.bloodType());
         patient.setAddress(request.address());
@@ -154,15 +161,7 @@ public class PatientService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Get patients by zip code
-     */
-    public List<PatientResponse> getPatientsByZipCode(String zipCode) {
-        return patientRepository.findByZipCode(zipCode)
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
+
     /**
      * Get patients by blood type
      */

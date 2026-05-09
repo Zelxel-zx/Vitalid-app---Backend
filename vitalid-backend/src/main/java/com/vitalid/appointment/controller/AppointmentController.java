@@ -81,7 +81,7 @@ public class AppointmentController {
                 appointment.getId(),
                 appointment.getPatient().getId(),
                 appointment.getDoctor().getId(),
-                appointment.getPatient().getName(),
+                appointment.getPatient().getUser().getName(),
                 appointment.getDoctor().getUser().getName(),
                 appointment.getDate(),
                 appointment.getTime(),

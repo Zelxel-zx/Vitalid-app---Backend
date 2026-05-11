@@ -30,6 +30,15 @@ services:
     networks:
       - vitalid-network
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: vitalid-mailhog
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - vitalid-network
+
 volumes:
   vitalid_postgres_data:
 

@@ -56,9 +56,14 @@ public class MedicationController {
         return medicationRepository.findAll().stream().map(this::toResponse).toList();
     }
 
-    @PostMapping
-    public ResponseEntity<MedicationResponse> createMedication(@RequestBody MedicationRequest request) {
-        var patient = patientRepository.findById(request.patientId())
+    @GetMapping("/patient/{userId}")
+    public List<MedicationResponse> getMedicationsForPatient(@PathVariable Long userId) {
+        return medicationRepository.findByPatient_User_Id(userId).stream().map(this::toResponse).toList();
+    }
+
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<MedicationResponse> createMedication(@PathVariable Long userId, @RequestBody MedicationRequest request) {
+        var patient = patientRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
 
         var doctor = request.doctorId() != null
@@ -76,6 +81,9 @@ public class MedicationController {
         medication.setPrescribedBy(request.prescribedBy() == null ? doctor.getUser().getName() : request.prescribedBy());
         medication.setStartDate(request.startDate());
         medication.setEndDate(request.endDate());
+        medication.setTotalPills(request.totalPills() != null ? request.totalPills() : 30);
+        medication.setPillsRemaining(request.totalPills() != null ? request.totalPills() : 30);
+        medication.setSideEffects("");
 
         Medication saved = medicationRepository.save(medication);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(saved));
@@ -106,7 +114,29 @@ public class MedicationController {
         record.setTimestamp(timestamp);
 
         dosageRecordRepository.save(record);
+        
+        if (medication.getPillsRemaining() != null && medication.getPillsRemaining() > 0) {
+            medication.setPillsRemaining(medication.getPillsRemaining() - 1);
+            medicationRepository.save(medication);
+        }
+        
         return ResponseEntity.ok(new MessageResponse("Dose recorded successfully"));
+    }
+
+    @PutMapping("/{medicationId}/side-effects")
+    public ResponseEntity<MedicationResponse> addSideEffect(@PathVariable Long medicationId, @RequestBody SideEffectRequest request) {
+        Medication medication = medicationRepository.findById(medicationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medication not found"));
+        
+        String currentEffects = medication.getSideEffects() == null ? "" : medication.getSideEffects();
+        if (!currentEffects.isEmpty()) {
+            currentEffects += ", ";
+        }
+        currentEffects += request.effect();
+        medication.setSideEffects(currentEffects);
+        
+        Medication saved = medicationRepository.save(medication);
+        return ResponseEntity.ok(toResponse(saved));
     }
 
     private Checklist createChecklistForMedication(Medication medication) {
@@ -126,17 +156,23 @@ public class MedicationController {
                 medication.getFrequency(),
                 medication.getPrescribedBy(),
                 medication.getStartDate(),
-                medication.getEndDate()
+                medication.getEndDate(),
+                medication.getTotalPills(),
+                medication.getPillsRemaining(),
+                medication.getSideEffects()
         );
     }
 
-    public record MedicationRequest(Long patientId, Long doctorId, String name, String dosage, String frequency, String prescribedBy, LocalDate startDate, LocalDate endDate) {
+    public record MedicationRequest(Long patientId, Long doctorId, String name, String dosage, String frequency, String prescribedBy, LocalDate startDate, LocalDate endDate, Integer totalPills) {
     }
 
-    public record MedicationResponse(Long id, String name, String dosage, String frequency, String prescribedBy, LocalDate startDate, LocalDate endDate) {
+    public record MedicationResponse(Long id, String name, String dosage, String frequency, String prescribedBy, LocalDate startDate, LocalDate endDate, Integer totalPills, Integer pillsRemaining, String sideEffects) {
     }
 
     public record DoseRequest(String time, String timestamp) {
+    }
+
+    public record SideEffectRequest(String effect) {
     }
 
     public record MessageResponse(String message) {

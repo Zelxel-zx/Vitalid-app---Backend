@@ -36,6 +36,12 @@ public class ReportService {
         this.medicationRepository = medicationRepository;
     }
 
+    public byte[] buildPatientReportForUser(Long userId) {
+        Patient patient = patientRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+        return buildPatientReport(patient.getId());
+    }
+
     public byte[] buildPatientReport(Long patientId) {
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));

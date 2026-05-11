@@ -13,5 +13,6 @@ import java.util.List;
 public interface MedicationRepository extends JpaRepository<Medication, Long> {
 
     List<Medication> findByPatientId(Long patientId);
+    List<Medication> findByPatient_User_Id(Long userId);
 }
 

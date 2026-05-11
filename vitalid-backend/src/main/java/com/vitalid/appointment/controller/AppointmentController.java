@@ -38,8 +38,8 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<AppointmentResponse> createAppointment(@RequestBody AppointmentRequest request) {
-        var patient = patientRepository.findById(request.patientId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
+        var patient = patientRepository.findByUser_Id(request.patientId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found for user ID " + request.patientId()));
         var doctor = doctorRepository.findById(request.doctorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
 
@@ -67,14 +67,20 @@ public class AppointmentController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found"));
     }
 
-    @GetMapping("/doctor/{doctorId}")
-    public List<AppointmentResponse> getAppointmentsForDoctor(@PathVariable Long doctorId) {
-        return appointmentRepository.findByDoctorId(doctorId).stream().map(this::toResponse).toList();
+    @GetMapping("/doctor/{userId}")
+    public List<AppointmentResponse> getAppointmentsForDoctor(@PathVariable Long userId) {
+        var doctor = doctorRepository.findByUser_Id(userId);
+        if (doctor == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found for user ID " + userId);
+        }
+        return appointmentRepository.findByDoctorId(doctor.getId()).stream().map(this::toResponse).toList();
     }
 
-    @GetMapping("/patient/{patientId}")
-    public List<AppointmentResponse> getAppointmentsForPatient(@PathVariable Long patientId) {
-        return appointmentRepository.findByPatientId(patientId).stream().map(this::toResponse).toList();
+    @GetMapping("/patient/{userId}")
+    public List<AppointmentResponse> getAppointmentsForPatient(@PathVariable Long userId) {
+        var patient = patientRepository.findByUser_Id(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found for user ID " + userId));
+        return appointmentRepository.findByPatientId(patient.getId()).stream().map(this::toResponse).toList();
     }
 
     @PutMapping("/{id}/reschedule")

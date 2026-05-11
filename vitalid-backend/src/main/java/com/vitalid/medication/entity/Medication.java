@@ -48,6 +48,15 @@ public class Medication {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "total_pills")
+    private Integer totalPills;
+
+    @Column(name = "pills_remaining")
+    private Integer pillsRemaining;
+
+    @Column(name = "side_effects", length = 1000)
+    private String sideEffects;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

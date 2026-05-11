@@ -23,4 +23,13 @@ public class ReportController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
     }
+
+    @GetMapping("/user/{userId}/pdf")
+    public ResponseEntity<byte[]> downloadPatientReportForUser(@PathVariable Long userId) {
+        byte[] pdf = reportService.buildPatientReportForUser(userId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=vitalid-report-" + userId + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
+    }
 }

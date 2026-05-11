@@ -2,6 +2,7 @@ package com.vitalid.profile.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -19,8 +20,14 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ProfileUpdateRequest {
-
-    // TODO: Add properties
+    private String name;
+    private String phone;
+    private String avatar;
+    private String bloodType;
+    private List<String> allergies;
+    private String specialty;
+    private LocalDate dateOfBirth;
+    private Integer experienceYears;
 
 }
 

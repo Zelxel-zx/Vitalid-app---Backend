@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PasswordChangeRequest {
-
-    // TODO: Add properties
+    private String oldPassword;
+    private String newPassword;
 
 }
 

@@ -15,8 +15,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ChatMessageResponse {
-
-    // TODO: Add properties
+    private Long id;
+    private String sender;
+    private String content;
+    private String timestamp;
 
 }
 

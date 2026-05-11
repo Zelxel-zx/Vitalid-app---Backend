@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * Doctor Entity
@@ -35,6 +36,18 @@ public class Doctor {
 
     @Column(name = "unread_messages")
     private Integer unreadMessages = 0;
+
+    @Column(name = "verified")
+    private Boolean verified = false;
+
+    @Column(name = "experience_years")
+    private Integer experienceYears;
+
+    @Column(name = "availability_start")
+    private LocalTime availabilityStart;
+
+    @Column(name = "availability_end")
+    private LocalTime availabilityEnd;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

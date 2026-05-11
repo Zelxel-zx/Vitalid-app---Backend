@@ -119,6 +119,18 @@ public class AuthService {
         // Se configura en el frontend eliminando el token del almacenamiento local
     }
 
+    public void recoverPassword(String email, String newPassword) {
+        if (email == null || email.trim().isEmpty() || newPassword == null || newPassword.trim().isEmpty()) {
+            throw new InvalidCredentialsException("Email and new password are required");
+        }
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 
     public AuthResponse updateUser(Long userId, RegisterRequest request) {
         User user = userRepository.findById(userId)

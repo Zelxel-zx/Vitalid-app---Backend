@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -76,6 +77,28 @@ public class AppointmentController {
         return appointmentRepository.findByPatientId(patientId).stream().map(this::toResponse).toList();
     }
 
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<AppointmentResponse> rescheduleAppointment(
+            @PathVariable Long id,
+            @RequestBody RescheduleRequest request) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Appointment not found"));
+
+        if (request.date() == null || request.time() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date and time are required");
+        }
+
+        LocalDateTime newDateTime = LocalDateTime.of(request.date(), request.time());
+        if (newDateTime.isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reschedule requires at least 2 hours notice");
+        }
+
+        appointment.setDate(request.date());
+        appointment.setTime(request.time());
+        Appointment saved = appointmentRepository.save(appointment);
+        return ResponseEntity.ok(toResponse(saved));
+    }
+
     private AppointmentResponse toResponse(Appointment appointment) {
         return new AppointmentResponse(
                 appointment.getId(),
@@ -91,6 +114,9 @@ public class AppointmentController {
     }
 
     public record AppointmentRequest(Long patientId, Long doctorId, LocalDate date, LocalTime time, String reason) {
+    }
+
+    public record RescheduleRequest(LocalDate date, LocalTime time) {
     }
 
     public record AppointmentResponse(Long id, Long patientId, Long doctorId, String patientName, String doctorName, LocalDate date, LocalTime time, String reason, String status) {

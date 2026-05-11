@@ -14,8 +14,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ChatMessageRequest {
-
-    // TODO: Add properties
+    private Long doctorId;
+    private Long senderId;
+    private String content;
 
 }
 

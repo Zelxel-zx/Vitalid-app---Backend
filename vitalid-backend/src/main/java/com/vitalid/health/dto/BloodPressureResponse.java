@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BloodPressureResponse {
-
-    // TODO: Add properties
+    private String date;
+    private Double value;
 
 }
 

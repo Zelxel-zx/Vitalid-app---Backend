@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UnreadResponse {
-
-    // TODO: Add properties
+    private Long doctorId;
+    private long unreadCount;
 
 }
 

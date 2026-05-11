@@ -120,5 +120,14 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok("Usuarios obtenidos exitosamente", users));
     }
 
+    @PostMapping("/recover")
+    public ResponseEntity<ApiResponse<String>> recoverPassword(@RequestBody PasswordRecoveryRequest request) {
+        authService.recoverPassword(request.email(), request.newPassword());
+        return ResponseEntity.ok(ApiResponse.ok("Password updated"));
+    }
+
+    public record PasswordRecoveryRequest(String email, String newPassword) {
+    }
+
 }
 

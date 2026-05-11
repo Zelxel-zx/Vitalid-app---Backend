@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BloodSugarResponse {
-
-    // TODO: Add properties
+    private String date;
+    private Double value;
 
 }
 

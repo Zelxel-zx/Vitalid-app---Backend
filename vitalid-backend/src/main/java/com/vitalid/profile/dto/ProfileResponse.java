@@ -2,6 +2,7 @@ package com.vitalid.profile.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -22,8 +23,18 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ProfileResponse {
-
-    // TODO: Add properties
+    private Long id;
+    private String name;
+    private String email;
+    private String phone;
+    private String type;
+    private String avatar;
+    private String bloodType;
+    private List<String> allergies;
+    private LocalDate dateOfBirth;
+    private String specialty;
+    private Integer experienceYears;
+    private Boolean verified;
 
 }
 

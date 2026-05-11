@@ -1,18 +1,72 @@
 package com.vitalid.profile.controller;
 
-/*
+import com.vitalid.profile.dto.ProfileResponse;
+import com.vitalid.profile.dto.ProfileUpdateRequest;
+import com.vitalid.profile.dto.PasswordChangeRequest;
+import com.vitalid.profile.service.ProfileService;
+import com.vitalid.auth.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+
+/**
  * Profile Controller
  * Handles user profile information and settings
- * 
- * Endpoints:
- * GET  /api/profile - Get user profile by userId
- * PUT  /api/profile - Update user profile (name, phone)
- * 
- * Records:
- * - ProfileUpdateRequest(String name, String phone)
- * - ProfileResponse(Long id, String name, String email, String phone, String type,
- *                   String bloodType, String address, String city, String state, String zipCode,
- *                   String medicalHistory, String allergies)
- * - MessageResponse(String message)
  */
+@RestController
+@RequestMapping("/api/profile")
+public class ProfileController {
+
+	@Autowired
+	private ProfileService profileService;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@GetMapping
+	public ProfileResponse getProfile(@RequestParam(value = "userId", required = false) Long userId) {
+		Long resolvedUserId = resolveUserId(userId);
+		return profileService.getProfile(resolvedUserId);
+	}
+
+	@PutMapping
+	public ProfileResponse updateProfile(
+			@RequestParam(value = "userId", required = false) Long userId,
+			@RequestBody ProfileUpdateRequest request) {
+		Long resolvedUserId = resolveUserId(userId);
+		return profileService.updateProfile(resolvedUserId, request);
+	}
+
+	@PutMapping("/password")
+	public ResponseEntity<MessageResponse> changePassword(
+			@RequestParam(value = "userId", required = false) Long userId,
+			@RequestBody PasswordChangeRequest request) {
+		Long resolvedUserId = resolveUserId(userId);
+		profileService.changePassword(resolvedUserId, request);
+		return ResponseEntity.ok(new MessageResponse("Password updated"));
+	}
+
+	private Long resolveUserId(Long userId) {
+		if (userId != null) {
+			return userId;
+		}
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || authentication.getPrincipal() == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+		}
+
+		String email = authentication.getPrincipal().toString();
+		return userRepository.findByEmail(email)
+				.map(user -> user.getId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	}
+
+	public record MessageResponse(String message) {
+	}
+}
 

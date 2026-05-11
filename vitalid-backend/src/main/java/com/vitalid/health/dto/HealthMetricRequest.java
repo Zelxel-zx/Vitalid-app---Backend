@@ -14,8 +14,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class HealthMetricRequest {
-
-    // TODO: Add properties
+    private Long patientId;
+    private String metric;
+    private Double value;
+    private String unit;
+    private String timestamp;
+    private String notes;
 
 }
 

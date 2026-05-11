@@ -14,5 +14,8 @@ public record PatientResponse(
     String allergies,
     Boolean isActive,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    Long userId,
+    String name,
+    String email
 ) {}

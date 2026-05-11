@@ -57,6 +57,22 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        if (savedUser.getType() == UserType.PATIENT) {
+            Patient patient = new Patient();
+            patient.setUser(savedUser);
+            patient.setIsActive(true);
+            patientRepository.save(patient);
+        } else if (savedUser.getType() == UserType.DOCTOR) {
+            Doctor doctor = new Doctor();
+            doctor.setUser(savedUser);
+            doctor.setStatus("OFFLINE");
+            doctor.setVerified(false);
+            doctor.setExperienceYears(0);
+            doctor.setUnreadMessages(0);
+            doctor.setSpecialty("General"); // Default specialty
+            doctorRepository.save(doctor);
+        }
+
         String token = jwtTokenProvider.generateToken(savedUser.getEmail());
         return new AuthResponse(
             savedUser.getId(), 

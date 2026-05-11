@@ -147,7 +147,10 @@ public class PatientService {
             patient.getAllergies(),
             patient.getIsActive(),
             patient.getCreatedAt(),
-            patient.getUpdatedAt()
+            patient.getUpdatedAt(),
+            patient.getUser() != null ? patient.getUser().getId() : null,
+            patient.getUser() != null ? patient.getUser().getName() : "Usuario Desconocido",
+            patient.getUser() != null ? patient.getUser().getEmail() : ""
         );
     }
 

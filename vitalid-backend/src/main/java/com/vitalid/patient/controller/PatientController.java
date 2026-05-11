@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
  */
 @RestController
 @RequestMapping("/api/patients")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class PatientController {
 
     @Autowired

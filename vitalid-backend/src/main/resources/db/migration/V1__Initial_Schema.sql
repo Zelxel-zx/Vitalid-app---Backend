@@ -3,7 +3,7 @@
 -- Description: Initial database structure for Vitalid telemedicine platform
 
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(200) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
@@ -13,19 +13,23 @@ CREATE TABLE users (
 );
 
 CREATE TABLE doctors (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     specialty VARCHAR(100) NOT NULL,
     avatar VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'OFFLINE',
     unread_messages INTEGER NOT NULL DEFAULT 0,
+    verified BOOLEAN DEFAULT FALSE,
+    experience_years INTEGER,
+    availability_start TIME,
+    availability_end TIME,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE patients (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     date_of_birth DATE,
     blood_type VARCHAR(10),
     phone_number VARCHAR(50),
@@ -41,9 +45,9 @@ CREATE TABLE patients (
 );
 
 CREATE TABLE appointments (
-    id SERIAL PRIMARY KEY,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    doctor_id INTEGER NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    patient_id BIGINT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    doctor_id BIGINT NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
     date DATE NOT NULL,
     time TIME NOT NULL,
     reason VARCHAR(255),
@@ -53,9 +57,9 @@ CREATE TABLE appointments (
 );
 
 CREATE TABLE messages (
-    id SERIAL PRIMARY KEY,
-    sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     sent_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     is_read BOOLEAN NOT NULL DEFAULT FALSE,
@@ -63,9 +67,9 @@ CREATE TABLE messages (
 );
 
 CREATE TABLE treatments (
-    id SERIAL PRIMARY KEY,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    doctor_id INTEGER NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    patient_id BIGINT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    doctor_id BIGINT NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
     progress INTEGER NOT NULL DEFAULT 0,
@@ -76,9 +80,9 @@ CREATE TABLE treatments (
 );
 
 CREATE TABLE medications (
-    id SERIAL PRIMARY KEY,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    doctor_id INTEGER NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    patient_id BIGINT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    doctor_id BIGINT NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
     name VARCHAR(150) NOT NULL,
     dosage VARCHAR(100),
     frequency VARCHAR(50),
@@ -90,23 +94,23 @@ CREATE TABLE medications (
 );
 
 CREATE TABLE checklists (
-    id SERIAL PRIMARY KEY,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    medication_id INTEGER NOT NULL REFERENCES medications(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    patient_id BIGINT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    medication_id BIGINT NOT NULL REFERENCES medications(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE scheduled_times (
-    id SERIAL PRIMARY KEY,
-    checklist_id INTEGER NOT NULL REFERENCES checklists(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    checklist_id BIGINT NOT NULL REFERENCES checklists(id) ON DELETE CASCADE,
     time VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE dosage_records (
-    id SERIAL PRIMARY KEY,
-    checklist_id INTEGER NOT NULL REFERENCES checklists(id) ON DELETE CASCADE,
-    medication_id INTEGER NOT NULL REFERENCES medications(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    checklist_id BIGINT NOT NULL REFERENCES checklists(id) ON DELETE CASCADE,
+    medication_id BIGINT NOT NULL REFERENCES medications(id) ON DELETE CASCADE,
     scheduled_time VARCHAR(10),
     actual_time VARCHAR(20),
     is_taken BOOLEAN NOT NULL DEFAULT FALSE,
@@ -114,8 +118,8 @@ CREATE TABLE dosage_records (
 );
 
 CREATE TABLE health_metrics (
-    id SERIAL PRIMARY KEY,
-    patient_id INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    patient_id BIGINT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
     metric VARCHAR(100) NOT NULL,
     value DOUBLE PRECISION NOT NULL,
     unit VARCHAR(20),

@@ -18,7 +18,11 @@ CREATE TABLE doctors (
     specialty VARCHAR(100) NOT NULL,
     avatar VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'OFFLINE',
-    unread_messages BIGINT NOT NULL DEFAULT 0,
+    unread_messages INTEGER NOT NULL DEFAULT 0,
+    verified BOOLEAN DEFAULT FALSE,
+    experience_years INTEGER,
+    availability_start TIME,
+    availability_end TIME,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
 );
@@ -68,7 +72,7 @@ CREATE TABLE treatments (
     doctor_id BIGINT NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
-    progress BIGINT NOT NULL DEFAULT 0,
+    progress INTEGER NOT NULL DEFAULT 0,
     next_appointment DATE,
     medications TEXT,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),

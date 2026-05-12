@@ -1,19 +1,22 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
 
-WORKDIR /app
-
+# Cache de dependencias: copiamos solo el pom primero
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn -B -q dependency:go-offline
 
+# Ahora copiamos el código y empaquetamos
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn -B -q clean package -DskipTests
 
-FROM eclipse-temurin:17-jre
-
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+# Copiamos el JAR generado por la etapa de build.
+# Ajusta el patrón si tu artifactId/version generan otro nombre.
+COPY --from=build /workspace/target/*.jar app.jar
 
+# EXPOSE es informativo; Render inyecta el puerto real en la variable PORT
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

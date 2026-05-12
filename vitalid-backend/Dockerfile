@@ -1,15 +1,15 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /workspace
 
 # Cache de dependencias: copiamos solo el pom primero
 COPY pom.xml .
-RUN mvn -B -q dependency:go-offline
+RUN mvn dependency:go-offline -B
 
 # Ahora copiamos el código y empaquetamos
 COPY src ./src
-RUN mvn -B -q clean package -DskipTests
+RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 # Copiamos el JAR generado por la etapa de build.

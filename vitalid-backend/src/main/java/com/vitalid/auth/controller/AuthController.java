@@ -25,7 +25,7 @@ import java.util.List;
  * Handles user registration, login, and token refresh
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping({"/api/auth", "/auth"})
 @Tag(name = "Auth", description = "Registro y autenticacion de usuarios")
 @SecurityScheme(
     name = "bearerAuth",

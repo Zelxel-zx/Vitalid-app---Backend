@@ -1,0 +1,29 @@
+﻿package com.vitalid.repositories;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
+import com.vitalid.models.Patient;
+import java.util.Optional;
+import java.util.List;
+
+/**
+ * Patient Repository
+ * Handles database operations for Patient entity
+ */
+@Repository
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+
+    Optional<Patient> findByUser_Id(Long userId);
+
+    List<Patient> findByBloodType(String bloodType);
+
+    List<Patient> findByAllergiesContaining(String allergies);
+
+    List<Patient> findByCity(String city);
+
+    List<Patient> findByState(String state);
+}
+
+
+

@@ -18,7 +18,7 @@ import java.util.List;
  * Handles treatment plans and medical treatment management
  */
 @RestController
-@RequestMapping("/api/treatments")
+@RequestMapping("/treatments")
 public class TreatmentController {
 
     private final TreatmentRepository treatmentRepository;

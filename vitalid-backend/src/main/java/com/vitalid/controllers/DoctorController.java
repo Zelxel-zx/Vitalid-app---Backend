@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Handles doctor profile and information management
  */
 @RestController
-@RequestMapping("/api/doctors")
+@RequestMapping("/doctors")
 public class DoctorController {
 
     private final DoctorRepository doctorRepository;

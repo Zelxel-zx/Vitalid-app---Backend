@@ -29,7 +29,7 @@ import java.util.Optional;
  * Handles medication and prescription management
  */
 @RestController
-@RequestMapping("/api/medications")
+@RequestMapping("/medications")
 public class MedicationController {
 
     private final MedicationRepository medicationRepository;

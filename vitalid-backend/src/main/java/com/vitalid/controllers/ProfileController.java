@@ -18,7 +18,7 @@ import org.springframework.security.core.Authentication;
  * Handles user profile information and settings
  */
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/profile")
 public class ProfileController {
 
 	@Autowired

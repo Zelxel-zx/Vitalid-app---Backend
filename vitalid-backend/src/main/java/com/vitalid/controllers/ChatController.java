@@ -16,7 +16,7 @@ import java.util.List;
  * Handles messaging between patients and doctors
  */
 @RestController
-@RequestMapping({"/api/chat", "/api/messages"})
+@RequestMapping("/chat")
 public class ChatController {
 
 	@Autowired

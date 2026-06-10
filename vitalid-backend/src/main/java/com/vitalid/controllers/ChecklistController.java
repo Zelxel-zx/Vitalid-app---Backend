@@ -26,7 +26,7 @@ import java.util.Optional;
  * Handles medication adherence checklists and dosage records
  */
 @RestController
-@RequestMapping({"/api/checklist", "/api/checklists"})
+@RequestMapping("/checklist")
 public class ChecklistController {
 
     private final ChecklistRepository checklistRepository;

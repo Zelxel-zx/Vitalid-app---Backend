@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Handles health measurements and vital signs tracking
  */
 @RestController
-@RequestMapping("/api/health")
+@RequestMapping("/health")
 public class HealthController {
 
     @Autowired

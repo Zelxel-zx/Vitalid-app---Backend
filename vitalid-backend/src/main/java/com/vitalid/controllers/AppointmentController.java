@@ -20,7 +20,7 @@ import java.util.List;
  * Handles medical appointments scheduling and management
  */
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/appointments")
 public class AppointmentController {
 
     private final AppointmentRepository appointmentRepository;

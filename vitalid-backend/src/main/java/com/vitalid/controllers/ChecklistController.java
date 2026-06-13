@@ -3,22 +3,29 @@
 import com.vitalid.models.Checklist;
 import com.vitalid.models.DosageRecord;
 import com.vitalid.models.ScheduledTime;
+import com.vitalid.models.User;
+import com.vitalid.models.UserType;
 import com.vitalid.repositories.ChecklistRepository;
 import com.vitalid.repositories.DosageRecordRepository;
 import com.vitalid.models.Medication;
 import com.vitalid.repositories.MedicationRepository;
 import com.vitalid.models.Patient;
 import com.vitalid.repositories.PatientRepository;
+import com.vitalid.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -33,16 +40,19 @@ public class ChecklistController {
     private final MedicationRepository medicationRepository;
     private final PatientRepository patientRepository;
     private final DosageRecordRepository dosageRecordRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public ChecklistController(ChecklistRepository checklistRepository,
                                MedicationRepository medicationRepository,
                                PatientRepository patientRepository,
-                               DosageRecordRepository dosageRecordRepository) {
+                               DosageRecordRepository dosageRecordRepository,
+                               UserRepository userRepository) {
         this.checklistRepository = checklistRepository;
         this.medicationRepository = medicationRepository;
         this.patientRepository = patientRepository;
         this.dosageRecordRepository = dosageRecordRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping
@@ -83,6 +93,8 @@ public class ChecklistController {
         Medication medication = medicationRepository.findById(medicationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medication not found"));
 
+        validatePatientOwnsMedication(medication);
+
         Checklist checklist = checklistRepository.findByMedicationId(medicationId).stream().findFirst()
                 .orElseGet(() -> createChecklistForMedication(medication));
 
@@ -103,7 +115,53 @@ public class ChecklistController {
         record.setTimestamp(timestamp);
         dosageRecordRepository.save(record);
 
+        if (medication.getPillsRemaining() != null && medication.getPillsRemaining() > 0) {
+            medication.setPillsRemaining(medication.getPillsRemaining() - 1);
+            medicationRepository.save(medication);
+        }
+
         return ResponseEntity.ok(new MessageResponse("Dosage marked as taken"));
+    }
+
+    @PutMapping("/{medicationId}/side-effects")
+    public ResponseEntity<MedicationResponse> addSideEffect(@PathVariable Long medicationId, @RequestBody SideEffectRequest request) {
+        Medication medication = medicationRepository.findById(medicationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medication not found"));
+
+        validatePatientOwnsMedication(medication);
+
+        String currentEffects = medication.getSideEffects() == null ? "" : medication.getSideEffects();
+        if (!currentEffects.isEmpty()) {
+            currentEffects += ", ";
+        }
+        currentEffects += request.effect();
+        medication.setSideEffects(currentEffects);
+
+        Medication saved = medicationRepository.save(medication);
+        return ResponseEntity.ok(toMedicationResponse(saved));
+    }
+
+    private void validatePatientOwnsMedication(Medication medication) {
+        User currentUser = getAuthenticatedUser();
+        if (currentUser.getType() != UserType.PATIENT) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only patients can update checklist intake");
+        }
+
+        Long medicationPatientUserId = medication.getPatient().getUser().getId();
+        if (!Objects.equals(medicationPatientUserId, currentUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Medication does not belong to the authenticated patient");
+        }
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getName() == null || "anonymousUser".equals(authentication.getName())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        return userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user not found"));
     }
 
     private Checklist createChecklistForMedication(Medication medication) {
@@ -142,6 +200,21 @@ public class ChecklistController {
         );
     }
 
+    private MedicationResponse toMedicationResponse(Medication medication) {
+        return new MedicationResponse(
+                medication.getId(),
+                medication.getName(),
+                medication.getDosage(),
+                medication.getFrequency(),
+                medication.getPrescribedBy(),
+                medication.getStartDate(),
+                medication.getEndDate(),
+                medication.getTotalPills(),
+                medication.getPillsRemaining(),
+                medication.getSideEffects()
+        );
+    }
+
     public record ChecklistRequest(List<ChecklistMedication> medications) {
     }
 
@@ -155,6 +228,12 @@ public class ChecklistController {
     }
 
     public record ChecklistMarkTakenRequest(String time, String timestamp) {
+    }
+
+    public record SideEffectRequest(String effect) {
+    }
+
+    public record MedicationResponse(Long id, String name, String dosage, String frequency, String prescribedBy, LocalDate startDate, LocalDate endDate, Integer totalPills, Integer pillsRemaining, String sideEffects) {
     }
 
     public record CreateChecklistResponse(int medicationsAdded, String message) {

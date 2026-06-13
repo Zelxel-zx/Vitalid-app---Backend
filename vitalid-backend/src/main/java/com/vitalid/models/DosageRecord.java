@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * DosageRecord Entity
@@ -28,6 +29,17 @@ public class DosageRecord {
     @JoinColumn(name = "medication_id", nullable = false)
     private Medication medication;
 
+    @ManyToOne
+    @JoinColumn(name = "treatment_id")
+    private Treatment treatment;
+
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+
+    @Column(name = "scheduled_date")
+    private LocalDate scheduledDate;
+
     @Column(length = 10)
     private String scheduledTime;
 
@@ -42,7 +54,9 @@ public class DosageRecord {
 
     @PrePersist
     protected void onCreate() {
-        this.timestamp = LocalDateTime.now();
+        if (this.timestamp == null) {
+            this.timestamp = LocalDateTime.now();
+        }
     }
 }
 

@@ -2,24 +2,28 @@
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
- * DTO para request de crear/actualizar medicamento
- * 
- * TODO: Implement MedicationRequest with:
- * - patientId
- * - name
- * - dosage (e.g., "500mg", "1 tablet")
- * - frequency (DAILY, TWICE_DAILY, etc.)
- * - startDate
- * - endDate
+ * Request to create or update a medication inside a treatment.
  */
 @Data
 @NoArgsConstructor
 public class MedicationRequest {
 
-    // TODO: Add properties
-
+    private String name;
+    private String dosage;
+    private String frequency;
+    private String prescribedBy;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String instructions;
+    private String unitType;
+    private Integer totalPills;
+    private Integer pillsRemaining;
+    private Integer lowStockThreshold;
+    private List<String> scheduledTimes;
 }
 
 

@@ -27,8 +27,12 @@ public class Checklist {
     private Patient patient;
 
     @ManyToOne
-    @JoinColumn(name = "medication_id", nullable = false)
+    @JoinColumn(name = "medication_id")
     private Medication medication;
+
+    @ManyToOne
+    @JoinColumn(name = "treatment_id")
+    private Treatment treatment;
 
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduledTime> scheduledTimes;

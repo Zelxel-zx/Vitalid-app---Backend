@@ -19,8 +19,12 @@ public class ScheduledTime {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "checklist_id", nullable = false)
+    @JoinColumn(name = "checklist_id")
     private Checklist checklist;
+
+    @ManyToOne
+    @JoinColumn(name = "medication_id")
+    private Medication medication;
 
     @Column(length = 10, nullable = false)
     private String time;

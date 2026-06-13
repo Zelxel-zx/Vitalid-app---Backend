@@ -1,28 +1,29 @@
-﻿package com.vitalid.dtos.treatment;
+package com.vitalid.dtos.treatment;
 
+import com.vitalid.dtos.medication.MedicationResponse;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.util.List;
 
-/**
- * DTO para response de tratamiento
- * 
- * TODO: Implement TreatmentResponse with:
- * - id (treatment ID)
- * - title
- * - doctor (doctor name or ID)
- * - status (ACTIVE, COMPLETED, PENDING)
- * - progress (0-100 percentage)
- * - nextAppointment (date)
- * - medications (list of medication names/IDs)
- */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class TreatmentResponse {
 
-    // TODO: Add properties
-
+    private Long id;
+    private Long patientId;
+    private Long doctorId;
+    private String patientName;
+    private String doctorName;
+    private String title;
+    private String description;
+    private String status;
+    private Integer progress;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate nextAppointment;
+    private List<MedicationResponse> medications;
 }
-
-
-

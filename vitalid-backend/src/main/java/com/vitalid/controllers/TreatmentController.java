@@ -1,112 +1,88 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
-import com.vitalid.models.Treatment;
-import com.vitalid.repositories.TreatmentRepository;
-import com.vitalid.repositories.DoctorRepository;
-import com.vitalid.repositories.PatientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.vitalid.dtos.medication.MedicationRequest;
+import com.vitalid.dtos.medication.MedicationResponse;
+import com.vitalid.dtos.treatment.TreatmentRequest;
+import com.vitalid.dtos.treatment.TreatmentResponse;
+import com.vitalid.services.MedicationService;
+import com.vitalid.services.TreatmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.List;
 
 /**
  * Treatment Controller
- * Handles treatment plans and medical treatment management
+ * Handles treatment plans prescribed by doctors to patients.
  */
 @RestController
 @RequestMapping("/treatments")
 public class TreatmentController {
 
-    private final TreatmentRepository treatmentRepository;
-    private final PatientRepository patientRepository;
-    private final DoctorRepository doctorRepository;
+    private final TreatmentService treatmentService;
+    private final MedicationService medicationService;
 
-    @Autowired
-    public TreatmentController(TreatmentRepository treatmentRepository,
-                               PatientRepository patientRepository,
-                               DoctorRepository doctorRepository) {
-        this.treatmentRepository = treatmentRepository;
-        this.patientRepository = patientRepository;
-        this.doctorRepository = doctorRepository;
+    public TreatmentController(TreatmentService treatmentService,
+                               MedicationService medicationService) {
+        this.treatmentService = treatmentService;
+        this.medicationService = medicationService;
     }
 
     @GetMapping
     public List<TreatmentResponse> listTreatments() {
-        return treatmentRepository.findAll().stream().map(this::toResponse).toList();
+        return treatmentService.getAllTreatments();
+    }
+
+    @GetMapping("/{treatmentId}")
+    public TreatmentResponse getTreatmentById(@PathVariable Long treatmentId) {
+        return treatmentService.getTreatmentById(treatmentId);
     }
 
     @GetMapping("/active")
     public List<TreatmentResponse> getActiveTreatments() {
-        return treatmentRepository.findByStatus("ACTIVE").stream().map(this::toResponse).toList();
+        return treatmentService.getTreatmentsByStatus("ACTIVE");
     }
 
     @GetMapping("/completed")
     public List<TreatmentResponse> getCompletedTreatments() {
-        return treatmentRepository.findByStatus("COMPLETED").stream().map(this::toResponse).toList();
+        return treatmentService.getTreatmentsByStatus("COMPLETED");
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<TreatmentResponse> getTreatmentsByPatient(@PathVariable Long patientId) {
+        return treatmentService.getTreatmentsByPatientId(patientId);
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public List<TreatmentResponse> getTreatmentsByDoctor(@PathVariable Long doctorId) {
+        return treatmentService.getTreatmentsByDoctorId(doctorId);
     }
 
     @PostMapping
     public ResponseEntity<TreatmentResponse> createTreatment(@RequestBody TreatmentRequest request) {
-        var patient = patientRepository.findById(request.patientId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found"));
-        var doctor = doctorRepository.findById(request.doctorId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
-
-        Treatment treatment = new Treatment();
-        treatment.setPatient(patient);
-        treatment.setDoctor(doctor);
-        treatment.setTitle(request.title());
-        treatment.setStatus(request.status() == null ? "ACTIVE" : request.status());
-        treatment.setProgress(request.progress() == null ? 0 : request.progress());
-        treatment.setNextAppointment(request.nextAppointment());
-        treatment.setMedications(request.medications() == null ? null : String.join(",", request.medications()));
-
-        Treatment saved = treatmentRepository.save(treatment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(saved));
+        TreatmentResponse response = treatmentService.createTreatment(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{treatmentId}/progress")
-    public ResponseEntity<MessageResponse> updateProgress(@PathVariable Long treatmentId, @RequestBody ProgressRequest request) {
-        Treatment treatment = treatmentRepository.findById(treatmentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Treatment not found"));
-        if (request.progress() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Progress value required");
-        }
-        treatment.setProgress(request.progress());
-        treatmentRepository.save(treatment);
-        return ResponseEntity.ok(new MessageResponse("Treatment progress updated"));
+    @PutMapping("/{treatmentId}")
+    public TreatmentResponse updateTreatment(
+            @PathVariable Long treatmentId,
+            @RequestBody TreatmentRequest request) {
+        return treatmentService.updateTreatment(treatmentId, request);
     }
 
-    private TreatmentResponse toResponse(Treatment treatment) {
-        List<String> medications = treatment.getMedications() == null ? List.of()
-                : List.of(treatment.getMedications().split(","));
-        return new TreatmentResponse(
-                treatment.getId(),
-                treatment.getTitle(),
-                treatment.getDoctor().getUser().getName(),
-                treatment.getStatus(),
-                treatment.getProgress(),
-                treatment.getNextAppointment(),
-                medications
-        );
+    @PostMapping("/{treatmentId}/medications")
+    public ResponseEntity<MedicationResponse> createMedication(
+            @PathVariable Long treatmentId,
+            @RequestBody MedicationRequest request) {
+        MedicationResponse response = medicationService.createMedication(treatmentId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    public record TreatmentRequest(Long patientId, Long doctorId, String title, String status, Integer progress, List<String> medications, LocalDate nextAppointment) {
-    }
-
-    public record ProgressRequest(Integer progress) {
-    }
-
-    public record TreatmentResponse(Long id, String title, String doctor, String status, Integer progress, LocalDate nextAppointment, List<String> medications) {
-    }
-
-    public record MessageResponse(String message) {
+    @DeleteMapping("/{treatmentId}")
+    public ResponseEntity<Void> deleteTreatment(@PathVariable Long treatmentId) {
+        treatmentService.deleteTreatment(treatmentId);
+        return ResponseEntity.noContent().build();
     }
 }
-
-
-

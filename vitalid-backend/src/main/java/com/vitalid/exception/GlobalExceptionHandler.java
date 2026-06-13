@@ -11,16 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // Import service-specific exceptions
-import com.vitalid.appointment.exception.*;
-import com.vitalid.auth.exception.*;
-import com.vitalid.chat.exception.*;
-import com.vitalid.checklist.exception.*;
-import com.vitalid.doctor.exception.*;
-import com.vitalid.health.exception.*;
-import com.vitalid.medication.exception.*;
-import com.vitalid.patient.exception.*;
-import com.vitalid.profile.exception.*;
-import com.vitalid.treatment.exception.*;
+
 
 /**
  * Global Exception Handler for Vitalid Backend

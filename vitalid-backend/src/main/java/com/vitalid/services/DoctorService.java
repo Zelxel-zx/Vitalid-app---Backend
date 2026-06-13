@@ -1,0 +1,28 @@
+﻿package com.vitalid.services;
+
+import org.springframework.stereotype.Service;
+import com.vitalid.dtos.doctor.DoctorResponse;
+import com.vitalid.dtos.doctor.DoctorStatusRequest;
+import java.util.List;
+
+/**
+ * Doctor Service
+ * Handles doctor management operations
+ * 
+ * TODO: Implement methods:
+ * - getAllDoctors() -> List<DoctorResponse>
+ * - getDoctorById(Integer id) -> DoctorResponse
+ * - getDoctorsBySpecialty(String specialty) -> List<DoctorResponse>
+ * - updateDoctorStatus(Integer id, DoctorStatusRequest) -> void
+ * - getDoctorAvailability(Integer id) -> ?
+ * - getDoctorAppointments(Integer id) -> List<AppointmentResponse>
+ */
+@Service
+public class DoctorService {
+
+    // TODO: Implement doctor business logic
+
+}
+
+
+

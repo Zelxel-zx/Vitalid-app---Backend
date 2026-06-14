@@ -28,7 +28,7 @@ public class Doctor {
     @Column(length = 100, nullable = false)
     private String specialty;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     private String avatar;
 
     @Column(name = "medical_center_address", length = 500)

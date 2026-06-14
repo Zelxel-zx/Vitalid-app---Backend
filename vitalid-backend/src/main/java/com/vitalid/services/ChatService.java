@@ -73,10 +73,15 @@ public class ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
         var sender = userRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+        var receiver = request.getReceiverUserId() == null
+                ? doctor.getUser()
+                : userRepository.findById(request.getReceiverUserId())
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "Receiver not found"));
 
         Message message = new Message();
         message.setSender(sender);
-        message.setReceiver(doctor.getUser());
+        message.setReceiver(receiver);
         message.setContent(request.getContent().trim());
         message.setSentAt(LocalDateTime.now());
         message.setIsRead(false);
@@ -102,6 +107,13 @@ public class ChatService {
             response.setUnreadCount(entry.getValue());
             return response;
         }).toList();
+    }
+
+    public long getUnreadCount(Long receiverId) {
+        if (receiverId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Receiver is required");
+        }
+        return messageRepository.countByReceiverIdAndIsReadFalse(receiverId);
     }
 
     public void markMessagesAsRead(Long doctorId, Long receiverId) {

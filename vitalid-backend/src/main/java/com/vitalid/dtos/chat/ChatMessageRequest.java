@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class ChatMessageRequest {
     private Long doctorId;
     private Long senderId;
+    private Long receiverUserId;
     private String content;
 
 }

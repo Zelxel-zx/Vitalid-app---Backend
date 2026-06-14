@@ -154,6 +154,7 @@ public class DoctorController {
         String doctorName = doctor.getUser() != null ? doctor.getUser().getName() : null;
         return new DoctorSummary(
                 doctor.getId(),
+                doctor.getUser() != null ? doctor.getUser().getId() : null,
                 doctorName,
                 doctor.getSpecialty(),
                 doctor.getAvatar(),
@@ -165,7 +166,7 @@ public class DoctorController {
         );
     }
 
-    public record DoctorSummary(Long id, String name, String specialty, String avatar, String medicalCenterAddress, String status, Integer unreadMessages, Integer experienceYears, Boolean verified) {
+    public record DoctorSummary(Long id, Long userId, String name, String specialty, String avatar, String medicalCenterAddress, String status, Integer unreadMessages, Integer experienceYears, Boolean verified) {
     }
 
     public record StatusRequest(String status) {

@@ -1,8 +1,10 @@
 package com.vitalid.controllers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vitalid.dtos.appointment.AppointmentRequest;
 import com.vitalid.dtos.appointment.AppointmentResponse;
 import com.vitalid.services.AppointmentService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +64,10 @@ public class AppointmentController {
         );
     }
 
-    public record RescheduleRequest(LocalDate date, LocalTime time) {
+    public record RescheduleRequest(
+            LocalDate date,
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+            @Schema(type = "string", example = "15:30", pattern = "HH:mm")
+            LocalTime time) {
     }
 }

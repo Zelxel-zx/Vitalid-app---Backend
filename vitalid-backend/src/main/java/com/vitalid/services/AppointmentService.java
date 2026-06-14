@@ -3,6 +3,7 @@ package com.vitalid.services;
 import com.vitalid.dtos.appointment.AppointmentRequest;
 import com.vitalid.dtos.appointment.AppointmentResponse;
 import com.vitalid.models.Appointment;
+import com.vitalid.models.AppointmentType;
 import com.vitalid.models.Doctor;
 import com.vitalid.models.Patient;
 import com.vitalid.repositories.AppointmentRepository;
@@ -73,6 +74,8 @@ public class AppointmentService {
         appointment.setDate(request.getDate());
         appointment.setTime(request.getTime());
         appointment.setReason(request.getReason());
+        appointment.setAppointmentType(Optional.ofNullable(request.getAppointmentType())
+                .orElse(AppointmentType.IN_PERSON));
         appointment.setStatus(Optional.ofNullable(request.getStatus()).orElse("SCHEDULED"));
 
         return toResponse(appointmentRepository.save(appointment));
@@ -134,6 +137,7 @@ public class AppointmentService {
                 appointment.getDate(),
                 appointment.getTime(),
                 appointment.getReason(),
+                appointment.getAppointmentType(),
                 appointment.getStatus()
         );
     }

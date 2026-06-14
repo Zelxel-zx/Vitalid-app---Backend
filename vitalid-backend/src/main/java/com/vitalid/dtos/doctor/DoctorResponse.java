@@ -11,6 +11,7 @@ public record DoctorResponse(
         String phone,
         String specialty,
         String avatar,
+        String medicalCenterAddress,
         String status,
         Integer unreadMessages,
         Boolean verified,

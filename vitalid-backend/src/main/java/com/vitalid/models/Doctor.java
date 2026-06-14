@@ -31,6 +31,9 @@ public class Doctor {
     @Column(length = 255)
     private String avatar;
 
+    @Column(name = "medical_center_address", length = 500)
+    private String medicalCenterAddress;
+
     @Column(length = 20, nullable = false)
     private String status = "OFFLINE";
 

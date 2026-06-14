@@ -45,6 +45,7 @@ public class DoctorService {
 
         doctor.setSpecialty(request.specialty().trim());
         doctor.setAvatar(normalize(request.avatar()));
+        doctor.setMedicalCenterAddress(normalize(request.medicalCenterAddress()));
         doctor.setExperienceYears(request.experienceYears() == null ? 0 : request.experienceYears());
         doctor.setAvailabilityStart(request.availabilityStart());
         doctor.setAvailabilityEnd(request.availabilityEnd());
@@ -65,6 +66,11 @@ public class DoctorService {
         if (request.avatar() != null && request.avatar().trim().length() > 255) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Doctor avatar cannot exceed 255 characters");
+        }
+        if (request.medicalCenterAddress() != null
+                && request.medicalCenterAddress().trim().length() > 500) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Medical center address cannot exceed 500 characters");
         }
         if (request.experienceYears() != null && request.experienceYears() < 0) {
             throw new ResponseStatusException(
@@ -101,6 +107,7 @@ public class DoctorService {
                 user.getPhone(),
                 doctor.getSpecialty(),
                 doctor.getAvatar(),
+                doctor.getMedicalCenterAddress(),
                 doctor.getStatus(),
                 doctor.getUnreadMessages(),
                 doctor.getVerified(),

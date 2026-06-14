@@ -41,6 +41,10 @@ public class Appointment {
     @Column(length = 255)
     private String reason;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "appointment_type", length = 20, nullable = false)
+    private AppointmentType appointmentType = AppointmentType.IN_PERSON;
+
     @Column(length = 30)
     private String status = "SCHEDULED";
 

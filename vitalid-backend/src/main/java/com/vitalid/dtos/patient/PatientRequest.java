@@ -14,6 +14,9 @@ public record PatientRequest(
     
     @Pattern(regexp = "^(O|A|B|AB)[+-]?$", message = "Tipo de sangre invÃ¡lido (O, A, B, AB)")
     String bloodType,
+
+    @Size(max = 255, message = "El avatar debe tener como maximo 255 caracteres")
+    String avatar,
     
     String address,
     

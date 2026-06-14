@@ -1,25 +1,18 @@
-﻿package com.vitalid.dtos.checklist;
+package com.vitalid.dtos.checklist;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para resumen del checklist
- * 
- * TODO: Implement ChecklistSummaryResponse with:
- * - totalMedications
- * - totalScheduledDoses
- * - takenDoses
- * - pendingDoses
- * - percentage (adherence percentage)
- */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class ChecklistSummaryResponse {
 
-    // TODO: Add properties
-
+    private Integer totalMedications;
+    private Integer totalScheduledDoses;
+    private Integer takenDoses;
+    private Integer pendingDoses;
+    private Integer missedDoses;
+    private Integer percentage;
 }
-
-
-

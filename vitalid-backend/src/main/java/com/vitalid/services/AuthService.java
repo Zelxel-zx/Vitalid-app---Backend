@@ -2,8 +2,6 @@
 
 import java.util.stream.Collectors;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vitalid.dtos.auth.LoginRequest;
@@ -14,9 +12,6 @@ import com.vitalid.models.UserType;
 import com.vitalid.exception.InvalidCredentialsException;
 import com.vitalid.repositories.UserRepository;
 import com.vitalid.exception.ResourceNotFoundException;
-import com.vitalid.dtos.patient.PatientResponse;
-import com.vitalid.models.Patient;
-import com.vitalid.repositories.PatientRepository;
 import com.vitalid.models.Doctor;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.security.JwtTokenProvider;
@@ -26,9 +21,6 @@ public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PatientRepository patientRepository;
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -57,12 +49,7 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        if (savedUser.getType() == UserType.PATIENT) {
-            Patient patient = new Patient();
-            patient.setUser(savedUser);
-            patient.setIsActive(true);
-            patientRepository.save(patient);
-        } else if (savedUser.getType() == UserType.DOCTOR) {
+        if (savedUser.getType() == UserType.DOCTOR) {
             Doctor doctor = new Doctor();
             doctor.setUser(savedUser);
             doctor.setStatus("OFFLINE");

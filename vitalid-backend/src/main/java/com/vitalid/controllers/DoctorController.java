@@ -1,8 +1,13 @@
 ﻿package com.vitalid.controllers;
 
+import com.vitalid.dtos.doctor.DoctorRequest;
+import com.vitalid.dtos.doctor.DoctorResponse;
+import com.vitalid.exception.ApiResponse;
 import com.vitalid.models.Doctor;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.repositories.AppointmentRepository;
+import com.vitalid.services.DoctorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +31,23 @@ public class DoctorController {
 
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
+    private final DoctorService doctorService;
 
     @Autowired
-    public DoctorController(DoctorRepository doctorRepository, AppointmentRepository appointmentRepository) {
+    public DoctorController(DoctorRepository doctorRepository,
+                            AppointmentRepository appointmentRepository,
+                            DoctorService doctorService) {
         this.doctorRepository = doctorRepository;
         this.appointmentRepository = appointmentRepository;
+        this.doctorService = doctorService;
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<DoctorResponse>> createDoctorProfile(
+            @Valid @RequestBody DoctorRequest request) {
+        DoctorResponse doctor = doctorService.createOrCompleteProfile(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Doctor profile completed successfully", doctor));
     }
 
     @GetMapping
@@ -108,19 +125,29 @@ public class DoctorController {
 
         Set<LocalTime> bookedTimes = appointmentRepository.findByDoctorIdAndDate(doctorId, date)
                 .stream()
+                .filter(appointment -> !"CANCELLED".equalsIgnoreCase(appointment.getStatus()))
                 .map(appointment -> appointment.getTime())
                 .collect(Collectors.toSet());
 
         List<String> available = new ArrayList<>();
+        List<String> occupied = new ArrayList<>();
+        if (date.isBefore(LocalDate.now())) {
+            return new AvailabilityResponse(available, occupied, start.toString(), end.toString());
+        }
         LocalTime current = start;
         while (current.isBefore(end)) {
-            if (!bookedTimes.contains(current)) {
-                available.add(current.toString());
+            boolean futureSlot = !date.equals(LocalDate.now()) || current.isAfter(LocalTime.now());
+            if (futureSlot) {
+                if (bookedTimes.contains(current)) {
+                    occupied.add(current.toString());
+                } else {
+                    available.add(current.toString());
+                }
             }
             current = current.plusMinutes(30);
         }
 
-        return new AvailabilityResponse(available, start.toString(), end.toString());
+        return new AvailabilityResponse(available, occupied, start.toString(), end.toString());
     }
 
     private DoctorSummary toSummary(Doctor doctor) {
@@ -130,6 +157,7 @@ public class DoctorController {
                 doctorName,
                 doctor.getSpecialty(),
                 doctor.getAvatar(),
+                doctor.getMedicalCenterAddress(),
                 doctor.getStatus(),
                 doctor.getUnreadMessages() == null ? 0 : doctor.getUnreadMessages(),
                 doctor.getExperienceYears(),
@@ -137,7 +165,7 @@ public class DoctorController {
         );
     }
 
-    public record DoctorSummary(Long id, String name, String specialty, String avatar, String status, Integer unreadMessages, Integer experienceYears, Boolean verified) {
+    public record DoctorSummary(Long id, String name, String specialty, String avatar, String medicalCenterAddress, String status, Integer unreadMessages, Integer experienceYears, Boolean verified) {
     }
 
     public record StatusRequest(String status) {
@@ -149,7 +177,11 @@ public class DoctorController {
     public record AvailabilityRequest(String startTime, String endTime) {
     }
 
-    public record AvailabilityResponse(List<String> availableSlots, String startTime, String endTime) {
+    public record AvailabilityResponse(
+            List<String> availableSlots,
+            List<String> occupiedSlots,
+            String startTime,
+            String endTime) {
     }
 
     public record MessageResponse(String message) {

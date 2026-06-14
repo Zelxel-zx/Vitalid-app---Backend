@@ -1,26 +1,24 @@
-﻿package com.vitalid.dtos.doctor;
+package com.vitalid.dtos.doctor;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
-/**
- * DTO para response de doctor
- * 
- * TODO: Implement DoctorResponse with:
- * - id
- * - name
- * - specialty
- * - avatar
- * - status (ONLINE, OFFLINE, BUSY)
- * - unreadMessages
- */
-@Data
-@NoArgsConstructor
-public class DoctorResponse {
-
-    // TODO: Add properties
-
+public record DoctorResponse(
+        Long id,
+        Long userId,
+        String name,
+        String email,
+        String phone,
+        String specialty,
+        String avatar,
+        String medicalCenterAddress,
+        String status,
+        Integer unreadMessages,
+        Boolean verified,
+        Integer experienceYears,
+        LocalTime availabilityStart,
+        LocalTime availabilityEnd,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
 }
-
-
-

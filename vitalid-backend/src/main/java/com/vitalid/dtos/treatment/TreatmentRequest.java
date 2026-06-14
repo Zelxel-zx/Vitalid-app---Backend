@@ -1,26 +1,23 @@
-﻿package com.vitalid.dtos.treatment;
+package com.vitalid.dtos.treatment;
 
+import com.vitalid.dtos.medication.MedicationRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.util.List;
 
-/**
- * DTO para request de crear/actualizar tratamiento
- * 
- * TODO: Implement TreatmentRequest with:
- * - patientId
- * - title
- * - status (ACTIVE, COMPLETED, PENDING)
- * - medications (list of medication IDs)
- * - nextAppointment (date)
- */
 @Data
 @NoArgsConstructor
 public class TreatmentRequest {
 
-    // TODO: Add properties
-
+    private Long patientId;
+    private Long doctorId;
+    private String title;
+    private String description;
+    private String status;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalDate nextAppointment;
+    private List<MedicationRequest> medications;
 }
-
-
-

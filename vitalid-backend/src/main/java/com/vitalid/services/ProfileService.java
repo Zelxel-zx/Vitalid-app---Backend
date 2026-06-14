@@ -74,6 +74,9 @@ public class ProfileService {
             if (request.getDateOfBirth() != null) {
                 patient.setDateOfBirth(request.getDateOfBirth());
             }
+            if (request.getAvatar() != null) {
+                patient.setAvatar(normalize(request.getAvatar()));
+            }
             patientRepository.save(patient);
         }
 
@@ -127,6 +130,7 @@ public class ProfileService {
                 response.setBloodType(patient.getBloodType());
                 response.setDateOfBirth(patient.getDateOfBirth());
                 response.setAllergies(splitCsv(patient.getAllergies()));
+                response.setAvatar(patient.getAvatar());
             }
         }
 
@@ -151,6 +155,10 @@ public class ProfileService {
                 .map(String::trim)
                 .filter(item -> !item.isEmpty())
                 .collect(Collectors.toList());
+    }
+
+    private String normalize(String value) {
+        return value == null || value.trim().isEmpty() ? null : value.trim();
     }
 
 }

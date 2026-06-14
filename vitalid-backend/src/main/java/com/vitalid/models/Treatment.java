@@ -4,9 +4,12 @@ import com.vitalid.models.Doctor;
 import com.vitalid.models.Patient;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Treatment Entity
@@ -33,8 +36,17 @@ public class Treatment {
     @Column(length = 255, nullable = false)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Column(length = 30)
     private String status = "ACTIVE";
+
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column
     private Integer progress = 0;
@@ -44,6 +56,11 @@ public class Treatment {
 
     @Column(columnDefinition = "TEXT")
     private String medications;
+
+    @OneToMany(mappedBy = "treatment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Medication> medicationItems;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

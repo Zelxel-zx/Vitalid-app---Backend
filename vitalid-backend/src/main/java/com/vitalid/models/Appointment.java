@@ -4,9 +4,7 @@ import com.vitalid.models.Doctor;
 import com.vitalid.models.Patient;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,8 +14,6 @@ import java.time.LocalDateTime;
  * Appointment Entity
  * Represents a medical appointment between patient and doctor
 */
-@Getter
-@Setter
 @Entity
 @Table(name = "appointments")
 @Data
@@ -44,6 +40,10 @@ public class Appointment {
 
     @Column(length = 255)
     private String reason;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "appointment_type", length = 20, nullable = false)
+    private AppointmentType appointmentType = AppointmentType.IN_PERSON;
 
     @Column(length = 30)
     private String status = "SCHEDULED";

@@ -13,13 +13,19 @@ services:
       - vitalid_postgres_data:/var/lib/postgresql/data
     networks:
       - vitalid-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitalid_user -d vitalid_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   vitalid-backend:
     build: .
     container_name: vitalid-backend
     restart: no
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/vitalid_db

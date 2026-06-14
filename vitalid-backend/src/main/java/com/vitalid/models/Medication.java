@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Medication Entity
@@ -30,6 +31,10 @@ public class Medication {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
+    @ManyToOne
+    @JoinColumn(name = "treatment_id", nullable = false)
+    private Treatment treatment;
+
     @Column(length = 150, nullable = false)
     private String name;
 
@@ -48,14 +53,23 @@ public class Medication {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "total_pills")
-    private Integer totalPills;
+    @Column(columnDefinition = "TEXT")
+    private String instructions;
+
+    @Column(name = "unit_type", length = 50)
+    private String unitType = "PILL";
 
     @Column(name = "pills_remaining")
     private Integer pillsRemaining;
 
+    @Column(name = "low_stock_threshold")
+    private Integer lowStockThreshold = 5;
+
     @Column(name = "side_effects", length = 1000)
     private String sideEffects;
+
+    @OneToMany(mappedBy = "medication", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduledTime> scheduledTimes;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

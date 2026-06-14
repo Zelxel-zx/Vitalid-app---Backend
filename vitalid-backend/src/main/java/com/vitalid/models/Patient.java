@@ -1,4 +1,4 @@
-﻿package com.vitalid.models;
+package com.vitalid.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,6 +51,9 @@ public class Patient{
 
     @Column(columnDefinition = "TEXT")
     private String allergies;
+
+    @Column(columnDefinition = "TEXT")
+    private String avatar;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

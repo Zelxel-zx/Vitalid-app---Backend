@@ -1,4 +1,4 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
 import com.vitalid.dtos.chat.ChatMessageRequest;
 import com.vitalid.dtos.chat.ChatMessageResponse;
@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Chat Controller
@@ -46,6 +47,22 @@ public class ChatController {
 			@RequestParam("receiverId") Long receiverId) {
 		chatService.markMessagesAsRead(doctorId, receiverId);
 		return ResponseEntity.ok(new MessageResponse("Messages marked as read"));
+	}
+
+	/**
+	 * Returns the list of patients who have exchanged messages with a doctor.
+	 * Used to render the doctor's inbox / conversation list.
+	 */
+	@GetMapping("/doctor/{doctorId}/conversations")
+	public List<ChatService.ConversationSummary> getConversations(@PathVariable Long doctorId) {
+		return chatService.getConversationsForDoctor(doctorId);
+	}
+
+	/** Simple total unread count for the nav badge. */
+	@GetMapping("/unread-count")
+	public Map<String, Long> getUnreadCount(@RequestParam("receiverId") Long receiverId) {
+		long count = chatService.getTotalUnreadCount(receiverId);
+		return Map.of("count", count);
 	}
 
 	public record MessageResponse(String message) {

@@ -1,4 +1,4 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
 import com.vitalid.dtos.doctor.DoctorRequest;
 import com.vitalid.dtos.doctor.DoctorResponse;
@@ -152,8 +152,10 @@ public class DoctorController {
 
     private DoctorSummary toSummary(Doctor doctor) {
         String doctorName = doctor.getUser() != null ? doctor.getUser().getName() : null;
+        Long userId = doctor.getUser() != null ? doctor.getUser().getId() : null;
         return new DoctorSummary(
                 doctor.getId(),
+                userId,
                 doctorName,
                 doctor.getSpecialty(),
                 doctor.getAvatar(),
@@ -165,7 +167,7 @@ public class DoctorController {
         );
     }
 
-    public record DoctorSummary(Long id, String name, String specialty, String avatar, String medicalCenterAddress, String status, Integer unreadMessages, Integer experienceYears, Boolean verified) {
+    public record DoctorSummary(Long id, Long userId, String name, String specialty, String avatar, String medicalCenterAddress, String status, Integer unreadMessages, Integer experienceYears, Boolean verified) {
     }
 
     public record StatusRequest(String status) {

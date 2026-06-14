@@ -36,6 +36,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("https://vitalidapp.netlify.app");
         configuration.addAllowedOrigin("http://localhost:5173");
+        configuration.addAllowedOrigin("http://localhost:5174");
+        configuration.addAllowedOrigin("http://localhost:5175");
+        configuration.addAllowedOrigin("http://127.0.0.1:5173");
+        configuration.addAllowedOrigin("http://127.0.0.1:5174");
+        configuration.addAllowedOriginPattern("https://*.railway.app");
+        configuration.addAllowedOriginPattern("https://*.onrender.com");
         configuration.addAllowedMethod("GET");
         configuration.addAllowedMethod("POST");
         configuration.addAllowedMethod("PUT");

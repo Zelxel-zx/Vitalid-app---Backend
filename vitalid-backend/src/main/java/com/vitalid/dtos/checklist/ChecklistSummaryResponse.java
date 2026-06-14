@@ -13,5 +13,6 @@ public class ChecklistSummaryResponse {
     private Integer totalScheduledDoses;
     private Integer takenDoses;
     private Integer pendingDoses;
+    private Integer missedDoses;
     private Integer percentage;
 }

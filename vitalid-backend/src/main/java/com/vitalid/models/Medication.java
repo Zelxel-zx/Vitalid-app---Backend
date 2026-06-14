@@ -59,9 +59,6 @@ public class Medication {
     @Column(name = "unit_type", length = 50)
     private String unitType = "PILL";
 
-    @Column(name = "total_pills")
-    private Integer totalPills;
-
     @Column(name = "pills_remaining")
     private Integer pillsRemaining;
 

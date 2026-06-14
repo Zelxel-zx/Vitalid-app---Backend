@@ -169,26 +169,14 @@ public class MedicationService {
                     .map(String::toUpperCase)
                     .orElse("PILL"));
         }
-        if (create || request.getTotalPills() != null) {
-            medication.setTotalPills(request.getTotalPills());
-        }
-        if (create || request.getPillsRemaining() != null) {
-            medication.setPillsRemaining(resolvePillsRemaining(request));
-        }
-        if (create || request.getLowStockThreshold() != null) {
-            medication.setLowStockThreshold(Optional.ofNullable(request.getLowStockThreshold()).orElse(5));
+        if (create) {
+            medication.setPillsRemaining(0);
+            medication.setLowStockThreshold(5);
         }
         if (medication.getSideEffects() == null) {
             medication.setSideEffects("");
         }
         validateMedication(medication);
-    }
-
-    private Integer resolvePillsRemaining(MedicationRequest request) {
-        if (request.getPillsRemaining() != null) {
-            return request.getPillsRemaining();
-        }
-        return request.getTotalPills();
     }
 
     private String required(String value, String message) {
@@ -234,14 +222,8 @@ public class MedicationService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Medication end date cannot be before start date");
         }
-        requireNonNegative(medication.getTotalPills(), "Total pills cannot be negative");
         requireNonNegative(medication.getPillsRemaining(), "Remaining pills cannot be negative");
         requireNonNegative(medication.getLowStockThreshold(), "Low stock threshold cannot be negative");
-        if (medication.getTotalPills() != null && medication.getPillsRemaining() != null
-                && medication.getPillsRemaining() > medication.getTotalPills()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Remaining pills cannot exceed total pills");
-        }
     }
 
     private void requireNonNegative(Integer value, String message) {
@@ -276,7 +258,6 @@ public class MedicationService {
                 medication.getEndDate(),
                 medication.getInstructions(),
                 medication.getUnitType(),
-                medication.getTotalPills(),
                 medication.getPillsRemaining(),
                 medication.getLowStockThreshold(),
                 medication.getSideEffects(),

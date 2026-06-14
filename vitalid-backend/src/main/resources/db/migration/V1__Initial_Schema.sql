@@ -130,9 +130,9 @@ CREATE TABLE health_metrics (
 
 INSERT INTO users (name, email, password, phone, type)
 VALUES
-    ('Dr. Ana Gómez', 'ana.gomez@vitalid.com', 'password123', '+5491122334455', 'DOCTOR'),
-    ('Dr. Luis Torres', 'luis.torres@vitalid.com', 'password123', '+5491166655544', 'DOCTOR'),
-    ('Dra. Marta Rojas', 'marta.rojas@vitalid.com', 'password123', '+5491177766655', 'DOCTOR'),
+    ('Ana Gómez', 'ana.gomez@vitalid.com', 'password123', '+5491122334455', 'DOCTOR'),
+    ('Luis Torres', 'luis.torres@vitalid.com', 'password123', '+5491166655544', 'DOCTOR'),
+    ('Marta Rojas', 'marta.rojas@vitalid.com', 'password123', '+5491177766655', 'DOCTOR'),
     ('Paola Sánchez', 'paola.sanchez@vitalid.com', 'password123', '+5491188877766', 'PATIENT'),
     ('Carlos Méndez', 'carlos.mendez@vitalid.com', 'password123', '+5491199988877', 'PATIENT');
 
@@ -159,7 +159,7 @@ VALUES
 
 INSERT INTO treatments (patient_id, doctor_id, title, status, progress, next_appointment, medications)
 VALUES
-    (1, 1, 'Tratamiento de hipertensión', 'ACTIVE', 40, '2026-05-24', 'Losartán'),
+    (1, 1, 'Tratamiento de hipertensión', 'ACTIVE', 40, '2026-07-24', 'Losartán'),
     (2, 2, 'Control de diabetes', 'COMPLETED', 100, '2026-05-14', 'Metformina');
 
 INSERT INTO checklists (patient_id, medication_id)

@@ -125,19 +125,29 @@ public class DoctorController {
 
         Set<LocalTime> bookedTimes = appointmentRepository.findByDoctorIdAndDate(doctorId, date)
                 .stream()
+                .filter(appointment -> !"CANCELLED".equalsIgnoreCase(appointment.getStatus()))
                 .map(appointment -> appointment.getTime())
                 .collect(Collectors.toSet());
 
         List<String> available = new ArrayList<>();
+        List<String> occupied = new ArrayList<>();
+        if (date.isBefore(LocalDate.now())) {
+            return new AvailabilityResponse(available, occupied, start.toString(), end.toString());
+        }
         LocalTime current = start;
         while (current.isBefore(end)) {
-            if (!bookedTimes.contains(current)) {
-                available.add(current.toString());
+            boolean futureSlot = !date.equals(LocalDate.now()) || current.isAfter(LocalTime.now());
+            if (futureSlot) {
+                if (bookedTimes.contains(current)) {
+                    occupied.add(current.toString());
+                } else {
+                    available.add(current.toString());
+                }
             }
             current = current.plusMinutes(30);
         }
 
-        return new AvailabilityResponse(available, start.toString(), end.toString());
+        return new AvailabilityResponse(available, occupied, start.toString(), end.toString());
     }
 
     private DoctorSummary toSummary(Doctor doctor) {
@@ -167,7 +177,11 @@ public class DoctorController {
     public record AvailabilityRequest(String startTime, String endTime) {
     }
 
-    public record AvailabilityResponse(List<String> availableSlots, String startTime, String endTime) {
+    public record AvailabilityResponse(
+            List<String> availableSlots,
+            List<String> occupiedSlots,
+            String startTime,
+            String endTime) {
     }
 
     public record MessageResponse(String message) {

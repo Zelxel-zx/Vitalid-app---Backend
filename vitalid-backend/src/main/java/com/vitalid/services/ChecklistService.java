@@ -56,27 +56,28 @@ public class ChecklistService {
         List<ChecklistMedicationResponse> medicationResponses = new ArrayList<>();
         int scheduled = 0;
         int taken = 0;
+        int missed = 0;
 
         for (Medication medication : medicationRepository.findByTreatmentId(treatmentId)) {
-            if (!isActiveOn(medication, treatment, date)) {
-                continue;
-            }
-
             List<ScheduledDoseResponse> doses = new ArrayList<>();
-            for (ScheduledTime scheduledTime :
-                    scheduledTimeRepository.findByMedicationId(medication.getId())) {
-                Optional<DosageRecord> record = records.stream()
-                        .filter(item -> Objects.equals(item.getMedication().getId(), medication.getId())
-                                && Objects.equals(item.getScheduledTime(), scheduledTime.getTime())
-                                && Boolean.TRUE.equals(item.getIsTaken()))
-                        .findFirst();
-                doses.add(new ScheduledDoseResponse(
-                        scheduledTime.getTime(),
-                        record.isPresent(),
-                        record.map(DosageRecord::getTimestamp).orElse(null)));
-                scheduled++;
-                if (record.isPresent()) {
-                    taken++;
+            if (isActiveOn(medication, treatment, date)) {
+                for (ScheduledTime scheduledTime :
+                        scheduledTimeRepository.findByMedicationId(medication.getId())) {
+                    Optional<DosageRecord> record = records.stream()
+                            .filter(item -> Objects.equals(item.getMedication().getId(), medication.getId())
+                                    && Objects.equals(item.getScheduledTime(), scheduledTime.getTime())
+                                    && Boolean.TRUE.equals(item.getIsTaken()))
+                            .findFirst();
+                    doses.add(new ScheduledDoseResponse(
+                            scheduledTime.getTime(),
+                            record.isPresent(),
+                            record.map(DosageRecord::getTimestamp).orElse(null)));
+                    scheduled++;
+                    if (record.isPresent()) {
+                        taken++;
+                    } else if (isDoseElapsed(date, scheduledTime.getTime())) {
+                        missed++;
+                    }
                 }
             }
 
@@ -96,7 +97,12 @@ public class ChecklistService {
 
         int percentage = scheduled == 0 ? 0 : (int) Math.round(taken * 100.0 / scheduled);
         ChecklistSummaryResponse summary = new ChecklistSummaryResponse(
-                medicationResponses.size(), scheduled, taken, scheduled - taken, percentage);
+                medicationResponses.size(),
+                scheduled,
+                taken,
+                scheduled - taken,
+                missed,
+                percentage);
         return new ChecklistResponse(
                 treatment.getId(),
                 treatment.getTitle(),
@@ -104,6 +110,17 @@ public class ChecklistService {
                 treatment.getProgress(),
                 summary,
                 medicationResponses);
+    }
+
+    private boolean isDoseElapsed(LocalDate date, String scheduledTime) {
+        LocalDate today = LocalDate.now();
+        if (date.isBefore(today)) {
+            return true;
+        }
+        if (date.isAfter(today)) {
+            return false;
+        }
+        return LocalTime.parse(scheduledTime).isBefore(LocalTime.now());
     }
 
     @Transactional
@@ -176,11 +193,8 @@ public class ChecklistService {
             dosageRecordRepository.save(record);
 
             if (medication.getPillsRemaining() != null) {
-                int total = Optional.ofNullable(medication.getTotalPills()).orElse(Integer.MAX_VALUE);
-                if (medication.getPillsRemaining() < total) {
-                    medication.setPillsRemaining(medication.getPillsRemaining() + 1);
-                    medicationRepository.save(medication);
-                }
+                medication.setPillsRemaining(medication.getPillsRemaining() + 1);
+                medicationRepository.save(medication);
             }
         }
 
@@ -203,10 +217,8 @@ public class ChecklistService {
         }
 
         int currentRemaining = Optional.ofNullable(medication.getPillsRemaining()).orElse(0);
-        int currentTotal = Optional.ofNullable(medication.getTotalPills()).orElse(currentRemaining);
         try {
             medication.setPillsRemaining(Math.addExact(currentRemaining, request.getQuantity()));
-            medication.setTotalPills(Math.addExact(currentTotal, request.getQuantity()));
         } catch (ArithmeticException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock quantity is too large");
         }

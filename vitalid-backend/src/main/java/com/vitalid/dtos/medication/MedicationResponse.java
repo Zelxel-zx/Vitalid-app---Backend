@@ -26,7 +26,6 @@ public class MedicationResponse {
     private LocalDate endDate;
     private String instructions;
     private String unitType;
-    private Integer totalPills;
     private Integer pillsRemaining;
     private Integer lowStockThreshold;
     private String sideEffects;

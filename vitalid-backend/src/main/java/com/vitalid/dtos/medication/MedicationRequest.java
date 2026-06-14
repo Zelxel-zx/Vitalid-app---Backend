@@ -20,9 +20,6 @@ public class MedicationRequest {
     private LocalDate endDate;
     private String instructions;
     private String unitType;
-    private Integer totalPills;
-    private Integer pillsRemaining;
-    private Integer lowStockThreshold;
     private List<String> scheduledTimes;
 }
 

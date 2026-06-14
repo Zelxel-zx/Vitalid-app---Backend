@@ -31,17 +31,17 @@ public class Doctor {
     @Column(length = 255)
     private String avatar;
 
-    @Column(length = 20)
+    @Column(length = 20, nullable = false)
     private String status = "OFFLINE";
 
-    @Column(name = "unread_messages")
+    @Column(name = "unread_messages", nullable = false)
     private Integer unreadMessages = 0;
 
-    @Column(name = "verified")
+    @Column(name = "verified", nullable = false)
     private Boolean verified = false;
 
-    @Column(name = "experience_years")
-    private Integer experienceYears;
+    @Column(name = "experience_years", nullable = false)
+    private Integer experienceYears = 0;
 
     @Column(name = "availability_start")
     private LocalTime availabilityStart;
@@ -57,6 +57,18 @@ public class Doctor {
 
     @PrePersist
     protected void onCreate() {
+        if (this.status == null) {
+            this.status = "OFFLINE";
+        }
+        if (this.unreadMessages == null) {
+            this.unreadMessages = 0;
+        }
+        if (this.verified == null) {
+            this.verified = false;
+        }
+        if (this.experienceYears == null) {
+            this.experienceYears = 0;
+        }
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }

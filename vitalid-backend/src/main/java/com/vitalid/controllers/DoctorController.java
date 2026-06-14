@@ -1,8 +1,13 @@
 ﻿package com.vitalid.controllers;
 
+import com.vitalid.dtos.doctor.DoctorRequest;
+import com.vitalid.dtos.doctor.DoctorResponse;
+import com.vitalid.exception.ApiResponse;
 import com.vitalid.models.Doctor;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.repositories.AppointmentRepository;
+import com.vitalid.services.DoctorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +31,23 @@ public class DoctorController {
 
     private final DoctorRepository doctorRepository;
     private final AppointmentRepository appointmentRepository;
+    private final DoctorService doctorService;
 
     @Autowired
-    public DoctorController(DoctorRepository doctorRepository, AppointmentRepository appointmentRepository) {
+    public DoctorController(DoctorRepository doctorRepository,
+                            AppointmentRepository appointmentRepository,
+                            DoctorService doctorService) {
         this.doctorRepository = doctorRepository;
         this.appointmentRepository = appointmentRepository;
+        this.doctorService = doctorService;
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<DoctorResponse>> createDoctorProfile(
+            @Valid @RequestBody DoctorRequest request) {
+        DoctorResponse doctor = doctorService.createOrCompleteProfile(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok("Doctor profile completed successfully", doctor));
     }
 
     @GetMapping

@@ -1,26 +1,26 @@
-﻿package com.vitalid.dtos.appointment;
+package com.vitalid.dtos.appointment;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para response de cita
- * 
- * TODO: Implement AppointmentResponse with:
- * - id (appointment ID)
- * - date
- * - time
- * - doctor (doctor name)
- * - reason
- * - status (SCHEDULED, COMPLETED, CANCELLED, NO_SHOW)
- */
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class AppointmentResponse {
 
-    // TODO: Add properties
-
+    private Long id;
+    private Long patientId;
+    private Long patientUserId;
+    private Long doctorId;
+    private Long doctorUserId;
+    private String patientName;
+    private String doctorName;
+    private LocalDate date;
+    private LocalTime time;
+    private String reason;
+    private String status;
 }
-
-
-

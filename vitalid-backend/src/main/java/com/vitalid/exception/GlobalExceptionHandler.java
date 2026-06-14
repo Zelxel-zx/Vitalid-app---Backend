@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -339,6 +340,20 @@ public class GlobalExceptionHandler {
     }
 
     // ==================== General Exception Handler (500) ====================
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatusException(
+            ResponseStatusException ex, WebRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        ErrorResponse errorResponse = new ErrorResponse(
+            ex.getReason() == null ? status.getReasonPhrase() : ex.getReason(),
+            status.getReasonPhrase(),
+            status.value(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        logger.warn("{}: {}", status, ex.getReason());
+        return new ResponseEntity<>(errorResponse, status);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, WebRequest request) {

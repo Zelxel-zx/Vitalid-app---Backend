@@ -6,6 +6,7 @@ public record PatientResponse(
     Long id,
     LocalDate dateOfBirth,
     String bloodType,
+    String avatar,
     String address,
     String city,
     String state,

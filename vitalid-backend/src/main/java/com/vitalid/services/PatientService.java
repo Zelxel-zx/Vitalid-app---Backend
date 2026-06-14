@@ -60,6 +60,7 @@ public class PatientService {
         patient.setUser(user);
         patient.setDateOfBirth(request.dateOfBirth());
         patient.setBloodType(request.bloodType());
+        patient.setAvatar(normalize(request.avatar()));
         patient.setAddress(request.address());
         patient.setCity(request.city());
         patient.setState(request.state());
@@ -91,6 +92,9 @@ public class PatientService {
 
             if(request.bloodType() != null) {
                 patient.setBloodType(request.bloodType());
+            }
+            if (request.avatar() != null) {
+                patient.setAvatar(normalize(request.avatar()));
             }
             
             if (request.dateOfBirth() != null) {
@@ -139,6 +143,7 @@ public class PatientService {
             patient.getId(),
             patient.getDateOfBirth(),
             patient.getBloodType(),
+            patient.getAvatar(),
             patient.getAddress(),
             patient.getCity(),
             patient.getState(),
@@ -180,6 +185,10 @@ public class PatientService {
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    private String normalize(String value) {
+        return value == null || value.trim().isEmpty() ? null : value.trim();
     }
 
 }

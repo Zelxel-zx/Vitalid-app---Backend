@@ -51,6 +51,11 @@ public class ChatController {
 		return Map.of("count", count);
 	}
 
+	@GetMapping("/unread-count")
+	public UnreadCountResponse getUnreadCount(@RequestParam("receiverId") Long receiverId) {
+		return new UnreadCountResponse(chatService.getUnreadCount(receiverId));
+	}
+
 	@PutMapping("/read/{doctorId}")
 	public ResponseEntity<MessageResponse> markMessagesAsRead(
 			@PathVariable Long doctorId,
@@ -60,6 +65,9 @@ public class ChatController {
 	}
 
 	public record MessageResponse(String message) {
+	}
+
+	public record UnreadCountResponse(long count) {
 	}
 }
 

@@ -1,4 +1,4 @@
-package com.vitalid.repositories;
+﻿package com.vitalid.repositories;
 
 import com.vitalid.models.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,7 +24,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     );
     List<Message> findBySenderIdAndReceiverIdAndIsReadFalse(Long senderId, Long receiverId);
 }
-
 
 
 

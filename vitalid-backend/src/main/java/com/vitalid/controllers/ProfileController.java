@@ -1,4 +1,4 @@
-package com.vitalid.controllers;
+﻿package com.vitalid.controllers;
 
 import com.vitalid.dtos.profile.ProfileResponse;
 import com.vitalid.dtos.profile.ProfileUpdateRequest;
@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Profile Controller
@@ -51,28 +52,17 @@ public class ProfileController {
 		return ResponseEntity.ok(new MessageResponse("Password updated"));
 	}
 
-	/**
-	 * Upload avatar image. Stored as Base64 data URI in DB — no filesystem needed.
-	 * Works on Railway, Render, and local Docker.
-	 */
-	@PostMapping("/avatar")
-	public ResponseEntity<AvatarResponse> uploadAvatar(
+	@PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public UploadResponse uploadAvatar(
 			@RequestParam(value = "userId", required = false) Long userId,
 			@RequestParam("file") MultipartFile file) {
 		Long resolvedUserId = resolveUserId(userId);
-		String dataUri = profileService.uploadAvatar(resolvedUserId, file);
-		return ResponseEntity.ok(new AvatarResponse(dataUri));
+		return new UploadResponse(profileService.uploadAvatar(resolvedUserId, file));
 	}
 
-	/**
-	 * Upload a file (image or PDF) for use in chat messages.
-	 * Returns a Base64 data URI to be sent as message content.
-	 */
-	@PostMapping("/chat-upload")
-	public ResponseEntity<AvatarResponse> uploadChatFile(
-			@RequestParam("file") MultipartFile file) {
-		String dataUri = profileService.uploadChatFile(file);
-		return ResponseEntity.ok(new AvatarResponse(dataUri));
+	@PostMapping(value = "/chat-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public UploadResponse uploadChatFile(@RequestParam("file") MultipartFile file) {
+		return new UploadResponse(profileService.encodeUpload(file, false));
 	}
 
 	private Long resolveUserId(Long userId) {
@@ -94,6 +84,9 @@ public class ProfileController {
 	public record MessageResponse(String message) {
 	}
 
-	public record AvatarResponse(String url) {
+	public record UploadResponse(String url) {
 	}
 }
+
+
+

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Chat Controller
@@ -38,6 +39,16 @@ public class ChatController {
 	@GetMapping("/unread")
 	public List<UnreadResponse> getUnreadMessages(@RequestParam("receiverId") Long receiverId) {
 		return chatService.getUnreadMessages(receiverId);
+	}
+
+	@GetMapping("/unread-count")
+	public Map<String, Long> getUnreadCount(@RequestParam("receiverId") Long receiverId) {
+		long count = chatService.getUnreadMessages(receiverId)
+				.stream()
+				.mapToLong(UnreadResponse::getUnreadCount)
+				.sum();
+
+		return Map.of("count", count);
 	}
 
 	@PutMapping("/read/{doctorId}")

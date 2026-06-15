@@ -73,10 +73,14 @@ public class ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
         var sender = userRepository.findById(request.getSenderId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+        var receiver = request.getReceiverUserId() != null
+        ? userRepository.findById(request.getReceiverUserId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receiver not found"))
+        : doctor.getUser();
 
         Message message = new Message();
         message.setSender(sender);
-        message.setReceiver(doctor.getUser());
+        message.setReceiver(receiver);
         message.setContent(request.getContent().trim());
         message.setSentAt(LocalDateTime.now());
         message.setIsRead(false);

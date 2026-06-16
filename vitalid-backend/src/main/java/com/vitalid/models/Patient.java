@@ -31,7 +31,7 @@ public class Patient{
     @Column(length = 50)
     private String bloodType;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 255)
     private String avatar;
 
     @Column(length = 1000)

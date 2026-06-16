@@ -108,13 +108,6 @@ public class ChatService {
         }).toList();
     }
 
-    public long getUnreadCount(Long receiverId) {
-        if (receiverId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Receiver is required");
-        }
-        return messageRepository.countByReceiverIdAndIsReadFalse(receiverId);
-    }
-
     public void markMessagesAsRead(Long doctorId, Long receiverId) {
         if (doctorId == null || receiverId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Doctor and receiver are required");

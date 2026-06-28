@@ -104,10 +104,12 @@ public class ChatService {
             Long doctorId = doctor != null ? doctor.getId() : null;
             UnreadResponse response = new UnreadResponse();
             response.setDoctorId(doctorId);
+            response.setSenderUserId(entry.getKey()); // sender's userId for patient identification
             response.setUnreadCount(entry.getValue());
             return response;
         }).toList();
     }
+
 
     public long getUnreadCount(Long receiverId) {
         if (receiverId == null) {

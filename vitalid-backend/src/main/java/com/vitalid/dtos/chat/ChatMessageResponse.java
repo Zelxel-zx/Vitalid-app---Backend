@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.chat;
+package com.vitalid.dtos.chat;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class ChatMessageResponse {
     private Long id;
     private String sender;
+    private Long senderId;
     private String content;
     private String timestamp;
 

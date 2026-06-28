@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.auth;
+package com.vitalid.dtos.auth;
 
 
 import com.vitalid.models.UserType;
@@ -12,7 +12,8 @@ public record AuthResponse(
     UserType type,
     LocalDateTime createdAt,
     String token,
-    String message
+    String message,
+    boolean profileCompleted
 ) {}
 
 

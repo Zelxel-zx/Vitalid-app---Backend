@@ -1,4 +1,4 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,9 @@ import com.vitalid.dtos.patient.PatientResponse;
 import com.vitalid.dtos.patient.PatientRequest;
 import com.vitalid.exception.ApiResponse;
 import com.vitalid.models.User;
+import com.vitalid.models.Appointment;
 import com.vitalid.repositories.UserRepository;
+import com.vitalid.repositories.AppointmentRepository;
 import com.vitalid.exception.ResourceNotFoundException;
 import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,9 @@ public class PatientController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     /**
      * Get all patients
@@ -79,6 +84,8 @@ public class PatientController {
         Long userId = user.getId();
         
         PatientResponse patient = patientService.createPatient(userId, request);
+        user.setProfileCompleted(true);
+        userRepository.save(user);
         return ApiResponse.ok("Paciente creado exitosamente", patient);
     }
 
@@ -138,8 +145,26 @@ public class PatientController {
         return ApiResponse.ok("Pacientes por estado recuperados exitosamente", patients);
     }
 
+    /**
+     * Get patients filtered by doctor (via appointments)
+     */
+    @GetMapping("/by-doctor/{doctorId}")
+    public ApiResponse<List<PatientResponse>> getPatientsByDoctor(@PathVariable Long doctorId) {
+        // Get all appointments for this doctor
+        List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
+        // Get unique patient IDs
+        List<Long> patientIds = appointments.stream()
+                .map(a -> a.getPatient().getId())
+                .distinct()
+                .toList();
+        // Get patient records
+        List<PatientResponse> patients = patientIds.stream()
+                .map(id -> patientService.getPatientById(id))
+                .toList();
+        return ApiResponse.ok("Pacientes del doctor recuperados", patients);
+    }
+
 
 }
-
 
 

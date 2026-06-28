@@ -1,4 +1,4 @@
-﻿package com.vitalid.services;
+package com.vitalid.services;
 
 import java.util.stream.Collectors;
 import java.util.List;
@@ -68,7 +68,8 @@ public class AuthService {
             savedUser.getType(), 
             savedUser.getCreatedAt(),
             token, 
-            "Usuario registrado exitosamente");  
+            "Usuario registrado exitosamente",
+            savedUser.isProfileCompleted());  
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -88,7 +89,8 @@ public class AuthService {
             user.getType(), 
             user.getCreatedAt(),
             token, 
-            "Inicio de sesiÃ³n exitoso");
+            "Inicio de sesión exitoso",
+            user.isProfileCompleted());
     }
 
     // 3. Validar token
@@ -164,7 +166,8 @@ public class AuthService {
             user.getType(),
             user.getCreatedAt(),
             jwtTokenProvider.generateToken(user.getEmail()),
-            "OperaciÃ³n exitosa"
+            "Operación exitosa",
+            user.isProfileCompleted()
         );
     }
 

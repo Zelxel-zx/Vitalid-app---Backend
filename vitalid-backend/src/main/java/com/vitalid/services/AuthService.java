@@ -14,6 +14,7 @@ import com.vitalid.repositories.UserRepository;
 import com.vitalid.exception.ResourceNotFoundException;
 import com.vitalid.models.Doctor;
 import com.vitalid.repositories.DoctorRepository;
+import com.vitalid.repositories.PatientRepository;
 import com.vitalid.security.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 @Service
@@ -24,6 +25,9 @@ public class AuthService {
 
     @Autowired
     private DoctorRepository doctorRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
     
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -80,6 +84,7 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
+        boolean profileCompleted = resolveProfileCompleted(user);
         String token = jwtTokenProvider.generateToken(user.getEmail());
         
         return new AuthResponse(
@@ -90,7 +95,7 @@ public class AuthService {
             user.getCreatedAt(),
             token, 
             "Inicio de sesión exitoso",
-            user.isProfileCompleted());
+            profileCompleted);
     }
 
     // 3. Validar token
@@ -159,6 +164,7 @@ public class AuthService {
     }
 
     private AuthResponse toResponse(User user) {
+        boolean profileCompleted = resolveProfileCompleted(user);
         return new AuthResponse(
             user.getId(),
             user.getName(),
@@ -167,8 +173,33 @@ public class AuthService {
             user.getCreatedAt(),
             jwtTokenProvider.generateToken(user.getEmail()),
             "Operación exitosa",
-            user.isProfileCompleted()
+            profileCompleted
         );
+    }
+
+    private boolean resolveProfileCompleted(User user) {
+        if (user.isProfileCompleted()) {
+            return true;
+        }
+
+        boolean hasCompletedProfile = switch (user.getType()) {
+            case PATIENT -> patientRepository.findByUser_Id(user.getId()).isPresent();
+            case DOCTOR -> {
+                Doctor doctor = doctorRepository.findByUser_Id(user.getId());
+                yield doctor != null
+                    && doctor.getMedicalCenterAddress() != null
+                    && !doctor.getMedicalCenterAddress().trim().isEmpty()
+                    && doctor.getAvailabilityStart() != null
+                    && doctor.getAvailabilityEnd() != null;
+            }
+        };
+
+        if (hasCompletedProfile) {
+            user.setProfileCompleted(true);
+            userRepository.save(user);
+        }
+
+        return hasCompletedProfile;
     }
 
     public List<AuthResponse> getAllUsers() {

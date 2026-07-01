@@ -1,4 +1,4 @@
-﻿package com.vitalid.models;
+package com.vitalid.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -36,6 +36,9 @@ public class User {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "profile_completed", nullable = false)
+    private boolean profileCompleted = false;
 }
 
 

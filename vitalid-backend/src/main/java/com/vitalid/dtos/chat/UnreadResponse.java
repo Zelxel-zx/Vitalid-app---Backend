@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.chat;
+package com.vitalid.dtos.chat;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,9 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UnreadResponse {
     private Long doctorId;
+    private Long senderUserId;  // userId of the sender (for patient→doctor messages)
     private long unreadCount;
-
 }
+
 
 
 

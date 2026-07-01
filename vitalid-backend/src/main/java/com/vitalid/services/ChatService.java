@@ -1,4 +1,4 @@
-﻿package com.vitalid.services;
+package com.vitalid.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,9 +103,18 @@ public class ChatService {
             Long doctorId = doctor != null ? doctor.getId() : null;
             UnreadResponse response = new UnreadResponse();
             response.setDoctorId(doctorId);
+            response.setSenderUserId(entry.getKey()); // sender's userId for patient identification
             response.setUnreadCount(entry.getValue());
             return response;
         }).toList();
+    }
+
+
+    public long getUnreadCount(Long receiverId) {
+        if (receiverId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Receiver is required");
+        }
+        return messageRepository.countByReceiverIdAndIsReadFalse(receiverId);
     }
 
     public void markMessagesAsRead(Long doctorId, Long receiverId) {
@@ -130,6 +139,7 @@ public class ChatService {
         ChatMessageResponse response = new ChatMessageResponse();
         response.setId(message.getId());
         response.setSender(message.getSender() != null ? message.getSender().getName() : null);
+        response.setSenderId(message.getSender() != null ? message.getSender().getId() : null);
         response.setContent(message.getContent());
         response.setTimestamp(message.getSentAt() != null ? message.getSentAt().toString() : null);
         return response;

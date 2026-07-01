@@ -1,4 +1,4 @@
-﻿package com.vitalid.services;
+package com.vitalid.services;
 
 import com.vitalid.dtos.auth.AuthResponse;
 import com.vitalid.dtos.auth.LoginRequest;
@@ -11,7 +11,6 @@ import com.vitalid.models.User;
 import com.vitalid.models.UserType;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.repositories.PatientRepository;
-import com.vitalid.repositories.UserRepository;
 import com.vitalid.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +32,7 @@ public class AuthService {
 
     @Autowired
     private PatientRepository patientRepository;
-
+    
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
@@ -85,15 +84,14 @@ public class AuthService {
         String token = jwtTokenProvider.generateToken(savedUser.getEmail());
 
         return new AuthResponse(
-                savedUser.getId(),
-                profileId,
-                savedUser.getName(),
-                savedUser.getEmail(),
-                savedUser.getType(),
-                savedUser.getCreatedAt(),
-                token,
-                "Usuario registrado exitosamente"
-        );
+            savedUser.getId(), 
+            savedUser.getName(), 
+            savedUser.getEmail(), 
+            savedUser.getType(), 
+            savedUser.getCreatedAt(),
+            token, 
+            "Usuario registrado exitosamente",
+            savedUser.isProfileCompleted());  
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -104,20 +102,18 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
-        Long profileId = resolveProfileId(user);
-
+        boolean profileCompleted = resolveProfileCompleted(user);
         String token = jwtTokenProvider.generateToken(user.getEmail());
 
         return new AuthResponse(
-                user.getId(),
-                profileId,
-                user.getName(),
-                user.getEmail(),
-                user.getType(),
-                user.getCreatedAt(),
-                token,
-                "Inicio de sesión exitoso"
-        );
+            user.getId(), 
+            user.getName(), 
+            user.getEmail(), 
+            user.getType(), 
+            user.getCreatedAt(),
+            token, 
+            "Inicio de sesión exitoso",
+            profileCompleted);
     }
 
     public boolean validateToken(String token) {
@@ -178,37 +174,42 @@ public class AuthService {
     }
 
     private AuthResponse toResponse(User user) {
-        Long profileId = resolveProfileId(user);
-
+        boolean profileCompleted = resolveProfileCompleted(user);
         return new AuthResponse(
-                user.getId(),
-                profileId,
-                user.getName(),
-                user.getEmail(),
-                user.getType(),
-                user.getCreatedAt(),
-                jwtTokenProvider.generateToken(user.getEmail()),
-                "Operación exitosa"
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getType(),
+            user.getCreatedAt(),
+            jwtTokenProvider.generateToken(user.getEmail()),
+            "Operación exitosa",
+            profileCompleted
         );
     }
 
-    private Long resolveProfileId(User user) {
-        if (user == null || user.getType() == null) {
-            return null;
+    private boolean resolveProfileCompleted(User user) {
+        if (user.isProfileCompleted()) {
+            return true;
         }
 
-        if (user.getType() == UserType.DOCTOR) {
-            Doctor doctor = doctorRepository.findByUser_Id(user.getId());
-            return doctor != null ? doctor.getId() : null;
+        boolean hasCompletedProfile = switch (user.getType()) {
+            case PATIENT -> patientRepository.findByUser_Id(user.getId()).isPresent();
+            case DOCTOR -> {
+                Doctor doctor = doctorRepository.findByUser_Id(user.getId());
+                yield doctor != null
+                    && doctor.getMedicalCenterAddress() != null
+                    && !doctor.getMedicalCenterAddress().trim().isEmpty()
+                    && doctor.getAvailabilityStart() != null
+                    && doctor.getAvailabilityEnd() != null;
+            }
+        };
+
+        if (hasCompletedProfile) {
+            user.setProfileCompleted(true);
+            userRepository.save(user);
         }
 
-        if (user.getType() == UserType.PATIENT) {
-            return patientRepository.findByUser_Id(user.getId())
-                    .map(Patient::getId)
-                    .orElse(null);
-        }
-
-        return null;
+        return hasCompletedProfile;
     }
 
     public List<AuthResponse> getAllUsers() {

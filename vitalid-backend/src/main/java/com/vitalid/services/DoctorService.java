@@ -6,6 +6,7 @@ import com.vitalid.models.Doctor;
 import com.vitalid.models.User;
 import com.vitalid.models.UserType;
 import com.vitalid.repositories.DoctorRepository;
+import com.vitalid.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ public class DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final ResourceAccessService resourceAccessService;
+    private final UserRepository userRepository;
 
     public DoctorService(DoctorRepository doctorRepository,
-                         ResourceAccessService resourceAccessService) {
+                         ResourceAccessService resourceAccessService,
+                         UserRepository userRepository) {
         this.doctorRepository = doctorRepository;
         this.resourceAccessService = resourceAccessService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -50,7 +54,10 @@ public class DoctorService {
         doctor.setAvailabilityStart(request.availabilityStart());
         doctor.setAvailabilityEnd(request.availabilityEnd());
 
-        return toResponse(doctorRepository.save(doctor));
+        Doctor savedDoctor = doctorRepository.save(doctor);
+        user.setProfileCompleted(true);
+        userRepository.save(user);
+        return toResponse(savedDoctor);
     }
 
     private void validateRequest(DoctorRequest request) {

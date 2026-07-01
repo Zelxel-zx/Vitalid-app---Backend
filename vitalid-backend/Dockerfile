@@ -2,9 +2,9 @@ FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /workspace
 
 # Cache de dependencias: copiamos solo el pom primero
-COPY vitalid-backend/pom.xml .
+COPY pom.xml .
 # Ahora copiamos el código y empaquetamos
-COPY vitalid-backend/src ./src
+COPY src ./src
 RUN find /workspace/src -name "*.java" -exec sed -i '1s/^\xef\xbb\xbf//' {} \;
 RUN mvn -B -ntp -DskipTests package
 

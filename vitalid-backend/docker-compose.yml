@@ -20,9 +20,7 @@ services:
       retries: 10
 
   vitalid-backend:
-    build:
-      context: ..
-      dockerfile: vitalid-backend/Dockerfile
+    build: .
     container_name: vitalid-backend
     restart: no
     depends_on:

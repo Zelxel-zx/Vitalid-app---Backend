@@ -1,4 +1,4 @@
-package com.vitalid.services;
+﻿package com.vitalid.services;
 
 import com.vitalid.dtos.auth.AuthResponse;
 import com.vitalid.dtos.auth.LoginRequest;
@@ -9,6 +9,7 @@ import com.vitalid.models.Doctor;
 import com.vitalid.models.Patient;
 import com.vitalid.models.User;
 import com.vitalid.models.UserType;
+import com.vitalid.repositories.UserRepository;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.repositories.PatientRepository;
 import com.vitalid.security.JwtTokenProvider;

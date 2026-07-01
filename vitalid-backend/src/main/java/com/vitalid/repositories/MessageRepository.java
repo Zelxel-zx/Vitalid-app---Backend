@@ -1,4 +1,4 @@
-﻿package com.vitalid.repositories;
+package com.vitalid.repositories;
 
 import com.vitalid.models.Message;
 import org.springframework.data.jpa.repository.JpaRepository;

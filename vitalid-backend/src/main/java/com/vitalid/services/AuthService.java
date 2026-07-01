@@ -1,4 +1,4 @@
-﻿package com.vitalid.services;
+package com.vitalid.services;
 
 import com.vitalid.dtos.auth.AuthResponse;
 import com.vitalid.dtos.auth.LoginRequest;

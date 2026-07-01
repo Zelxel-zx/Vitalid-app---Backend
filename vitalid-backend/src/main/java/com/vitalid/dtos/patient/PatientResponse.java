@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.patient;
+package com.vitalid.dtos.patient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 

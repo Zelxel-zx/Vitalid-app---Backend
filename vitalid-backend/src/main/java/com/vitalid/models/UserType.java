@@ -1,4 +1,4 @@
-﻿package com.vitalid.models;
+package com.vitalid.models;
 
 public enum UserType {
     PATIENT,

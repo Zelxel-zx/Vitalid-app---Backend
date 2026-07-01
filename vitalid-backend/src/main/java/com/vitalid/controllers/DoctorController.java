@@ -1,4 +1,4 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
 import com.vitalid.dtos.doctor.DoctorRequest;
 import com.vitalid.dtos.doctor.DoctorResponse;

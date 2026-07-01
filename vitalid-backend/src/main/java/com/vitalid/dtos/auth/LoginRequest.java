@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.auth;
+package com.vitalid.dtos.auth;
 
 
 import jakarta.validation.constraints.Email;

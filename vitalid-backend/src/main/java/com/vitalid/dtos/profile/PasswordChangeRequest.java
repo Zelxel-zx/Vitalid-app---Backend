@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.profile;
+package com.vitalid.dtos.profile;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

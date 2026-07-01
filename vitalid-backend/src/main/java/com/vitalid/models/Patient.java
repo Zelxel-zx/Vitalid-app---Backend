@@ -1,4 +1,4 @@
-﻿package com.vitalid.models;
+package com.vitalid.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

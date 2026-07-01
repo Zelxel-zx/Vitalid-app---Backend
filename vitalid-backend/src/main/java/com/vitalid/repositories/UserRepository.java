@@ -1,4 +1,4 @@
-﻿package com.vitalid.repositories;
+package com.vitalid.repositories;
 
 import com.vitalid.models.User;
 import com.vitalid.models.UserType;

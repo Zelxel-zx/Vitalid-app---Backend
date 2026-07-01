@@ -1,4 +1,4 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
 import com.vitalid.dtos.profile.ProfileResponse;
 import com.vitalid.dtos.profile.ProfileUpdateRequest;

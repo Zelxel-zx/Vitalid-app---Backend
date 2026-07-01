@@ -1,9 +1,7 @@
 package com.vitalid.dtos.auth;
 
-
 import com.vitalid.models.UserType;
 import java.time.LocalDateTime;
-
 
 public record AuthResponse(
     Long id,
@@ -15,7 +13,4 @@ public record AuthResponse(
     String message,
     boolean profileCompleted
 ) {}
-
-
-
 

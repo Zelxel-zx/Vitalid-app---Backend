@@ -1,5 +1,0 @@
-ALTER TABLE patients
-    ALTER COLUMN avatar TYPE TEXT;
-
-ALTER TABLE doctors
-    ALTER COLUMN avatar TYPE TEXT;

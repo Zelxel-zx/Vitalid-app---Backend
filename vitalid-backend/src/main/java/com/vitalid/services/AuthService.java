@@ -1,22 +1,26 @@
 package com.vitalid.services;
 
-import java.util.stream.Collectors;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.vitalid.dtos.auth.AuthResponse;
 import com.vitalid.dtos.auth.LoginRequest;
 import com.vitalid.dtos.auth.RegisterRequest;
-import com.vitalid.dtos.auth.AuthResponse;
-import com.vitalid.models.User;
-import com.vitalid.models.UserType;
 import com.vitalid.exception.InvalidCredentialsException;
-import com.vitalid.repositories.UserRepository;
 import com.vitalid.exception.ResourceNotFoundException;
 import com.vitalid.models.Doctor;
+import com.vitalid.models.Patient;
+import com.vitalid.models.User;
+import com.vitalid.models.UserType;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.repositories.PatientRepository;
 import com.vitalid.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AuthService {
 
@@ -36,14 +40,10 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     public AuthResponse register(RegisterRequest request) {
-            // Verificar si el email o telÃ©fono ya existen
-            // Crear nuevo usuario
-            // Guardar en la base de datos
-            // Generar token JWT
-            // Retornar AuthResponse con datos del usuario y token
-        if(userRepository.existsByEmail(request.email())) {
-            throw new InvalidCredentialsException("El email ya estÃ¡ registrado");
+        if (userRepository.existsByEmail(request.email())) {
+            throw new InvalidCredentialsException("El email ya está registrado");
         }
+
         User user = new User();
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
@@ -53,6 +53,8 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        Long profileId = null;
+
         if (savedUser.getType() == UserType.DOCTOR) {
             Doctor doctor = new Doctor();
             doctor.setUser(savedUser);
@@ -60,11 +62,27 @@ public class AuthService {
             doctor.setVerified(false);
             doctor.setExperienceYears(0);
             doctor.setUnreadMessages(0);
-            doctor.setSpecialty("General"); // Default specialty
-            doctorRepository.save(doctor);
+            doctor.setSpecialty("General");
+            doctor.setAvailabilityStart(LocalTime.of(9, 0));
+            doctor.setAvailabilityEnd(LocalTime.of(17, 0));
+
+            Doctor savedDoctor = doctorRepository.save(doctor);
+            profileId = savedDoctor.getId();
+        }
+
+        if (savedUser.getType() == UserType.PATIENT) {
+            Patient patient = new Patient();
+            patient.setUser(savedUser);
+            patient.setDateOfBirth(LocalDate.of(2000, 1, 1));
+            patient.setBloodType("No especificado");
+            patient.setIsActive(true);
+
+            Patient savedPatient = patientRepository.save(patient);
+            profileId = savedPatient.getId();
         }
 
         String token = jwtTokenProvider.generateToken(savedUser.getEmail());
+
         return new AuthResponse(
             savedUser.getId(), 
             savedUser.getName(), 
@@ -78,15 +96,15 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-            .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
-        
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid credentials");
         }
 
         boolean profileCompleted = resolveProfileCompleted(user);
         String token = jwtTokenProvider.generateToken(user.getEmail());
-        
+
         return new AuthResponse(
             user.getId(), 
             user.getName(), 
@@ -98,33 +116,23 @@ public class AuthService {
             profileCompleted);
     }
 
-    // 3. Validar token
     public boolean validateToken(String token) {
-        // Verificar si el token es vÃ¡lido
         return jwtTokenProvider.validateToken(token);
     }
-    
-    // 4. Refrescar token
+
     public String refreshToken(String token) {
-        // Generar nuevo token
-        System.out.println("DEBUG: Starting refreshToken with token: " + token.substring(0, 20) + "...");
-        
-        if(validateToken(token)) {
-            System.out.println("DEBUG: Token is valid");
+        if (validateToken(token)) {
             String email = jwtTokenProvider.getEmailFromToken(token);
-            System.out.println("DEBUG: Email extracted from token: " + email);
-            
+
             User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
-            System.out.println("DEBUG: User found: " + user.getEmail());
-            
-            String newToken = jwtTokenProvider.generateToken(user.getEmail());
-            System.out.println("DEBUG: New token generated successfully");
-            return newToken;
+                    .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+
+            return jwtTokenProvider.generateToken(user.getEmail());
         }
-        System.out.println("DEBUG: Token validation failed");
+
         throw new InvalidCredentialsException("Invalid token");
     }
+
     public void logout() {
         // Se configura en el frontend eliminando el token del almacenamiento local
     }
@@ -135,30 +143,32 @@ public class AuthService {
         }
 
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 
-
     public AuthResponse updateUser(Long userId, RegisterRequest request) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
         if (request.email() != null) {
             user.setEmail(request.email());
         }
+
         if (request.phone() != null) {
             user.setPhone(request.phone());
         }
+
         if (request.name() != null) {
             user.setName(request.name());
         }
+
         if (request.password() != null) {
             user.setPassword(passwordEncoder.encode(request.password()));
         }
-        
+
         User updatedUser = userRepository.save(user);
         return toResponse(updatedUser);
     }
@@ -209,7 +219,3 @@ public class AuthService {
                 .collect(Collectors.toList());
     }
 }
-
-
-
-

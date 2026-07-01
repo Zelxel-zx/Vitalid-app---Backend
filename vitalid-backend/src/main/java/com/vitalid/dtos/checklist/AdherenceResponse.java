@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.checklist;
+package com.vitalid.dtos.checklist;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

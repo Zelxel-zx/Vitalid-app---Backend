@@ -1,4 +1,4 @@
-﻿package com.vitalid.services;
+package com.vitalid.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;

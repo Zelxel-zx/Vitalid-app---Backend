@@ -1,4 +1,4 @@
-﻿package com.vitalid.dtos.doctor;
+package com.vitalid.dtos.doctor;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-﻿package com.vitalid.models;
+package com.vitalid.models;
 
 import com.vitalid.models.Doctor;
 import com.vitalid.models.Patient;

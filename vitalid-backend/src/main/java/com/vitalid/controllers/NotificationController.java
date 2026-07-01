@@ -1,4 +1,4 @@
-﻿package com.vitalid.controllers;
+package com.vitalid.controllers;
 
 import com.vitalid.exception.ApiResponse;
 import com.vitalid.services.NotificationService;

@@ -1,4 +1,4 @@
-﻿package com.vitalid.services;
+package com.vitalid.services;
 
 import com.vitalid.repositories.AppointmentRepository;
 import com.vitalid.repositories.MedicationRepository;

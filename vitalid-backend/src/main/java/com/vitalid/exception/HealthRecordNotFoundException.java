@@ -1,4 +1,4 @@
-﻿package com.vitalid.exception;
+package com.vitalid.exception;
 
 /**
  * Exception thrown when a health record is not found

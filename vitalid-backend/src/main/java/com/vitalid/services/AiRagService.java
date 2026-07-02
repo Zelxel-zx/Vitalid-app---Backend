@@ -220,7 +220,7 @@ public class AiRagService {
     }
 
     private boolean isMissingApiKey() {
-        return apiKey == null || apiKey.isBlank() || "REPLACE_WITH_GEMINI_API_KEY".equals(apiKey);
+        return apiKey == null || apiKey.isBlank();
     }
 
     private record KnowledgeChunk(String text, Set<String> tokens) {

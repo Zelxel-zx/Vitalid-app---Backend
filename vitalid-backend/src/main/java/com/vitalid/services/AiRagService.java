@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
@@ -48,8 +49,8 @@ public class AiRagService {
     private final String chatModel;
     private List<KnowledgeChunk> knowledgeChunks = List.of();
 
-    public AiRagService(@Value("${app.ai.gemini.api-key}") String apiKey,
-                        @Value("${app.ai.gemini.chat-model:gemini-1.5-flash}") String chatModel) {
+    public AiRagService(@Value("${app.ai.groq.api-key}") String apiKey,
+                        @Value("${app.ai.groq.chat-model:llama-3.1-8b-instant}") String chatModel) {
         this.restTemplate = new RestTemplate();
         this.apiKey = apiKey;
         this.chatModel = chatModel;
@@ -74,7 +75,7 @@ public class AiRagService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Message is required");
         }
         if (isMissingApiKey()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gemini API key is not configured");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Groq API key is not configured");
         }
         if (knowledgeChunks.isEmpty()) {
             ingestMedicalKnowledge();
@@ -93,7 +94,7 @@ public class AiRagService {
                 .map(KnowledgeChunk::text)
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        String reply = callGemini(context, question);
+        String reply = callGroq(context, question);
         return new RagAskResponse(reply, true, List.of(KNOWLEDGE_FILE));
     }
 
@@ -118,7 +119,7 @@ public class AiRagService {
                 .map(chunk -> new ScoredChunk(chunk, score(questionTokens, chunk.tokens())))
                 .filter(scored -> scored.score() > 0)
                 .sorted(Comparator.comparingInt(ScoredChunk::score).reversed())
-                .limit(4)
+                .limit(3)
                 .map(ScoredChunk::chunk)
                 .toList();
     }
@@ -143,40 +144,49 @@ public class AiRagService {
         return tokens;
     }
 
-    private String callGemini(String context, String question) {
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/"
-                + chatModel
-                + ":generateContent?key="
-                + apiKey;
+    private String callGroq(String context, String question) {
+        String endpoint = "https://api.groq.com/openai/v1/chat/completions";
 
         Map<String, Object> requestBody = Map.of(
-                "contents", List.of(Map.of(
-                        "role", "user",
-                        "parts", List.of(Map.of(
-                                "text", SYSTEM_PROMPT
-                                        + "\n\nContexto medico:\n"
+                "model", chatModel,
+                "messages", List.of(
+                        Map.of(
+                                "role", "system",
+                                "content", SYSTEM_PROMPT
+                        ),
+                        Map.of(
+                                "role", "user",
+                                "content", "Contexto medico:\n"
                                         + context
                                         + "\n\nPregunta del usuario:\n"
                                         + question
-                        ))
-                )),
-                "generationConfig", Map.of(
-                        "temperature", 0.2,
-                        "maxOutputTokens", 700
-                )
+                        )
+                ),
+                "temperature", 0.2,
+                "max_tokens", 700
         );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(apiKey);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
             ResponseEntity<Map> response = restTemplate.exchange(endpoint, HttpMethod.POST, entity, Map.class);
             return extractText(response.getBody());
+        } catch (HttpStatusCodeException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Groq request failed: "
+                            + exception.getStatusCode().value()
+                            + " "
+                            + sanitizeProviderError(exception.getResponseBodyAsString()),
+                    exception
+            );
         } catch (RestClientException exception) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
-                    "Gemini request failed",
+                    "Groq request failed",
                     exception
             );
         }
@@ -184,39 +194,39 @@ public class AiRagService {
 
     private String extractText(Map<?, ?> body) {
         if (body == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini returned an empty response");
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq returned an empty response");
         }
 
-        Object candidatesValue = body.get("candidates");
-        if (!(candidatesValue instanceof List<?> candidates) || candidates.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini returned no candidates");
+        Object choicesValue = body.get("choices");
+        if (!(choicesValue instanceof List<?> choices) || choices.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq returned no choices");
         }
 
-        Object firstCandidate = candidates.get(0);
-        if (!(firstCandidate instanceof Map<?, ?> candidate)) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini response format is invalid");
+        Object firstChoice = choices.get(0);
+        if (!(firstChoice instanceof Map<?, ?> choice)) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq response format is invalid");
         }
 
-        Object contentValue = candidate.get("content");
-        if (!(contentValue instanceof Map<?, ?> content)) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini response content is invalid");
+        Object messageValue = choice.get("message");
+        if (!(messageValue instanceof Map<?, ?> message)) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq response message is invalid");
         }
 
-        Object partsValue = content.get("parts");
-        if (!(partsValue instanceof List<?> parts) || parts.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini response parts are empty");
+        Object content = message.get("content");
+        if (content == null || content.toString().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq response content is empty");
         }
+        return content.toString();
+    }
 
-        Object firstPart = parts.get(0);
-        if (!(firstPart instanceof Map<?, ?> part)) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini response part is invalid");
+    private String sanitizeProviderError(String responseBody) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return "empty error body";
         }
-
-        Object text = part.get("text");
-        if (text == null || text.toString().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Gemini response text is empty");
-        }
-        return text.toString();
+        String compact = responseBody
+                .replaceAll("\\s+", " ")
+                .replace(apiKey, "[redacted]");
+        return compact.length() > 450 ? compact.substring(0, 450) + "..." : compact;
     }
 
     private boolean isMissingApiKey() {

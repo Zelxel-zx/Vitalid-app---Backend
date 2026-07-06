@@ -108,6 +108,9 @@ public class AiRagService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Groq API key is not configured");
         }
         AiAppointmentAction pendingAction = request == null ? null : request.pendingAction();
+        if (looksLikeDoctorUpcomingAppointmentsRequest(question)) {
+            return handleDoctorUpcomingAppointmentsRequest();
+        }
         if (pendingAction != null || looksLikeAppointmentRequest(question)) {
             return handleAppointmentRequest(question, pendingAction);
         }
@@ -182,6 +185,44 @@ public class AiRagService {
 
         AiAppointmentAction action = buildAppointmentAction(extraction);
         return new RagAskResponse(buildAppointmentReply(action), false, List.of(), action);
+    }
+
+    private RagAskResponse handleDoctorUpcomingAppointmentsRequest() {
+        if (!resourceAccessService.isAuthenticated()) {
+            return new RagAskResponse(
+                    "Para consultar tus proximas citas necesito que inicies sesion como doctor.",
+                    false,
+                    List.of(),
+                    null
+            );
+        }
+
+        Doctor doctor = resourceAccessService.currentDoctor();
+        List<AppointmentResponse> appointments = appointmentService.getDoctorAppointments(doctor.getId())
+                .stream()
+                .filter(this::isUpcomingAppointment)
+                .limit(5)
+                .toList();
+
+        if (appointments.isEmpty()) {
+            return new RagAskResponse(
+                    "No tienes citas proximas registradas.",
+                    false,
+                    List.of(),
+                    null
+            );
+        }
+
+        String appointmentsText = appointments.stream()
+                .map(this::formatDoctorAppointment)
+                .collect(Collectors.joining("\n"));
+
+        return new RagAskResponse(
+                "Tus proximas citas son:\n" + appointmentsText,
+                false,
+                List.of(),
+                null
+        );
     }
 
     private AppointmentExtraction extractAppointmentAction(String message, AiAppointmentAction pendingAction) {
@@ -417,6 +458,38 @@ public class AiRagService {
         String normalized = normalize(message);
         return Pattern.compile("\\b(agendar|agenda|reservar|reserva|programar|sacar)\\b").matcher(normalized).find()
                 && Pattern.compile("\\b(cita|consulta|turno)\\b").matcher(normalized).find();
+    }
+
+    private boolean looksLikeDoctorUpcomingAppointmentsRequest(String message) {
+        String normalized = normalize(message);
+        return Pattern.compile("\\b(proximas|siguientes|pendientes|agenda|programadas)\\b").matcher(normalized).find()
+                && Pattern.compile("\\b(citas|consultas|turnos)\\b").matcher(normalized).find();
+    }
+
+    private boolean isUpcomingAppointment(AppointmentResponse appointment) {
+        if (appointment == null
+                || appointment.getDate() == null
+                || appointment.getTime() == null
+                || "CANCELLED".equalsIgnoreCase(appointment.getStatus())
+                || "COMPLETED".equalsIgnoreCase(appointment.getStatus())) {
+            return false;
+        }
+        return appointment.getDate().isAfter(LocalDate.now())
+                || (appointment.getDate().isEqual(LocalDate.now())
+                && !appointment.getTime().isBefore(LocalTime.now()));
+    }
+
+    private String formatDoctorAppointment(AppointmentResponse appointment) {
+        String type = appointment.getAppointmentType() == AppointmentType.VIDEO_CALL
+                ? "videollamada"
+                : "presencial";
+        String reason = appointment.getReason() == null || appointment.getReason().isBlank()
+                ? "sin motivo registrado"
+                : appointment.getReason();
+        return "- " + appointment.getDate()
+                + " a las " + appointment.getTime()
+                + " con " + appointment.getPatientName()
+                + " (" + type + ", " + reason + ")";
     }
 
     private LocalDate parseDate(String value) {

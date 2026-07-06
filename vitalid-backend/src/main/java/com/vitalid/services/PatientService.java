@@ -56,8 +56,12 @@ public class PatientService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Patient patient = new Patient();
-        patient.setUser(user);
+        Patient patient = patientRepository.findByUser_Id(userId)
+                .orElseGet(() -> {
+                    Patient newPatient = new Patient();
+                    newPatient.setUser(user);
+                    return newPatient;
+                });
         patient.setDateOfBirth(request.dateOfBirth());
         patient.setBloodType(request.bloodType());
         patient.setAvatar(normalize(request.avatar()));

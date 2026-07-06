@@ -1,0 +1,88 @@
+Vitalid App - Base de conocimiento medico general para RAG
+Version inicial: 2026-07-01
+
+Objetivo del documento
+Este documento contiene informacion medica general para que el asistente de Vitalid responda preguntas frecuentes de salud de forma prudente. La informacion es educativa y no reemplaza la evaluacion de un profesional de salud.
+
+Reglas obligatorias para responder
+1. No diagnosticar enfermedades.
+2. No recetar medicamentos, dosis, cambios de dosis ni suspensiones de tratamiento.
+3. No afirmar que un sintoma es leve si puede ser grave.
+4. No interpretar examenes, imagenes o resultados de laboratorio como diagnostico definitivo.
+5. Recomendar consultar con un medico cuando el usuario describa sintomas persistentes, nuevos, intensos o preocupantes.
+6. Recomendar atencion de emergencia si aparecen senales de alarma.
+7. Si la pregunta requiere datos personales, antecedentes, examen fisico o laboratorio, explicar que se necesita evaluacion medica.
+8. Si el usuario pregunta por un medicamento, dar informacion general y recomendar seguir la indicacion del medico o la etiqueta del medicamento.
+9. Si el usuario olvido una dosis, no recomendar duplicar dosis. Indicar que revise la receta o consulte a su medico/farmaceutico, especialmente si es insulina, anticoagulante, medicamento para convulsiones, corazon o presion.
+
+Limites del asistente
+El asistente puede explicar conceptos generales de salud, describir senales de alarma, orientar sobre adherencia al tratamiento y sugerir cuando buscar ayuda. El asistente no sustituye al medico, no realiza diagnosticos y no debe tomar decisiones clinicas por el paciente.
+
+Senales generales de emergencia
+Buscar ayuda de emergencia si hay dolor fuerte en el pecho, dificultad para respirar, perdida de conocimiento, confusion intensa, debilidad o adormecimiento repentino de un lado del cuerpo, dificultad repentina para hablar, convulsiones, sangrado abundante, dolor de cabeza repentino e intenso, reaccion alergica con hinchazon de cara/labios/lengua o dificultad respiratoria, fiebre alta con rigidez de cuello, o empeoramiento rapido del estado general.
+
+Dolor en el pecho
+El dolor en el pecho puede tener causas leves o graves. Debe considerarse urgente si es opresivo, intenso, aparece con falta de aire, sudoracion fria, mareo, desmayo, nausea intensa, dolor que se irradia al brazo, espalda, cuello o mandibula, o si ocurre en una persona con antecedentes cardiacos, diabetes, hipertension o tabaquismo. En esos casos se debe buscar atencion de emergencia.
+
+Dificultad para respirar
+La dificultad para respirar requiere atencion rapida si aparece en reposo, empeora rapidamente, se acompana de dolor toracico, labios o dedos azulados, confusion, desmayo, fiebre alta, sibilancias intensas, o hinchazon de cara o garganta. Puede relacionarse con problemas respiratorios, cardiacos, alergicos u otras condiciones que necesitan evaluacion medica.
+
+Accidente cerebrovascular o derrame cerebral
+Los signos de alarma incluyen perdida repentina de equilibrio, cambios repentinos en la vision, debilidad o adormecimiento repentino de cara, brazo o pierna, especialmente de un lado del cuerpo, confusion repentina, dificultad para hablar o entender, y dolor de cabeza repentino e intenso sin causa conocida. Si aparece cualquiera de estos signos, se debe llamar a emergencias inmediatamente. No esperar a que los sintomas pasen.
+
+Presion arterial alta
+La presion alta muchas veces no causa sintomas. Una lectura aislada alta debe repetirse despues de descansar unos minutos, siguiendo una tecnica adecuada. Si la presion es mayor de 180/120 mmHg y se acompana de dolor en el pecho, falta de aire, dolor de espalda, debilidad, adormecimiento, cambio en la vision, dificultad para hablar, confusion o desmayo, es una emergencia. Si la presion se mantiene mayor de 180/120 mmHg sin sintomas, se debe contactar al profesional de salud lo antes posible para recibir indicaciones.
+
+Diabetes y azucar en sangre
+Las metas de glucosa dependen del paciente y deben ser definidas por su equipo medico. Como orientacion general, muchas personas con diabetes buscan valores antes de comer alrededor de 80 a 130 mg/dL y menores de 180 mg/dL dos horas despues de comer, pero estos rangos pueden cambiar por edad, embarazo, otras enfermedades o tipo de tratamiento.
+
+Azucar baja
+Una glucosa menor de 70 mg/dL suele considerarse baja. Puede causar temblor, sudoracion, hambre, palpitaciones, ansiedad, mareo, debilidad, confusion, vision borrosa o desmayo. Si la persona esta inconsciente, convulsiona o no puede tragar, no darle comida ni bebida por boca y buscar emergencia. Si la persona esta consciente y puede tragar, debe seguir el plan indicado por su equipo medico para hipoglucemia.
+
+Azucar alta
+La glucosa alta puede aparecer por enfermedad, estres, comer mas de lo habitual, omitir medicamentos o no recibir suficiente insulina. Puede causar mucha sed, orinar con frecuencia, cansancio, vision borrosa, nausea o perdida de peso. En personas con diabetes, si estan enfermas y la glucosa es de 240 mg/dL o mas, se recomienda revisar cetonas si tienen indicacion o kit disponible y contactar al medico si hay cetonas altas. La cetoacidosis diabetica es una emergencia.
+
+Fiebre
+La fiebre puede ser una respuesta a infecciones u otras condiciones. Buscar atencion medica pronto si hay fiebre persistente, fiebre en bebes pequenos, rigidez de cuello, confusion, dificultad para respirar, dolor fuerte, deshidratacion, erupcion que no desaparece al presionar, convulsiones, o si la persona tiene defensas bajas, cancer, trasplante, embarazo o enfermedad cronica importante.
+
+Dolor de cabeza
+Muchos dolores de cabeza no son peligrosos, pero se debe buscar emergencia si el dolor aparece de forma repentina e intenso, es el peor dolor de cabeza de la vida, aparece con debilidad, confusion, dificultad para hablar, fiebre con rigidez de cuello, desmayo, convulsion, vision doble, despues de un golpe en la cabeza, o si cambia claramente respecto a dolores previos.
+
+Mareo
+El mareo puede deberse a deshidratacion, problemas del oido, medicamentos, presion baja, glucosa baja u otras causas. Buscar atencion urgente si aparece con debilidad de un lado del cuerpo, dificultad para hablar, dolor en el pecho, falta de aire, desmayo, confusion, dolor de cabeza intenso, perdida de vision o dificultad para caminar.
+
+Dolor abdominal
+El dolor abdominal requiere evaluacion urgente si es intenso, progresivo, se acompana de abdomen rigido, vomitos persistentes, sangre en vomito o heces, fiebre alta, desmayo, embarazo, dolor en lado derecho bajo que empeora, color amarillo en piel u ojos, o incapacidad para evacuar gases/heces con hinchazon marcada.
+
+Alergias y reacciones alergicas
+Las alergias leves pueden causar estornudos, picazon, ronchas o congestion. Buscar emergencia si hay dificultad para respirar, hinchazon de labios, lengua, cara o garganta, ronquera repentina, mareo intenso, desmayo, confusion o ronchas generalizadas con malestar importante. Estos signos pueden indicar anafilaxia.
+
+Medicamentos y adherencia
+Tomar medicamentos segun la indicacion ayuda a controlar enfermedades cronicas y prevenir complicaciones. No suspender medicamentos por cuenta propia, incluso si la persona se siente bien, sin hablar con su medico. Si aparecen efectos secundarios, se debe registrar lo ocurrido y consultar al profesional de salud. Si el efecto secundario incluye dificultad para respirar, hinchazon de cara o garganta, desmayo, dolor en el pecho, sangrado importante o confusion, buscar emergencia.
+
+Dosis olvidada
+Si se olvida una dosis, la recomendacion general es revisar la receta, etiqueta o indicacion del medico. No duplicar la siguiente dosis salvo que el profesional de salud lo haya indicado especificamente. En medicamentos de alto riesgo como insulina, anticoagulantes, anticonvulsivos, medicamentos cardiacos, opioides o medicamentos para presion arterial, consultar con un profesional antes de corregir una dosis olvidada.
+
+Antibioticos
+Los antibioticos solo funcionan contra infecciones bacterianas, no contra virus como resfriado comun o gripe. Deben tomarse segun indicacion medica. No compartir antibioticos, no guardar sobrantes para otra enfermedad y no suspenderlos antes de tiempo sin indicacion del medico.
+
+Salud mental
+El asistente puede orientar sobre bienestar general, estres, sueno y busqueda de apoyo. Si el usuario expresa ideas de hacerse dano, suicidio, dano a otra persona, desesperanza extrema o riesgo inmediato, se debe recomendar ayuda urgente, contactar servicios de emergencia o una linea local de crisis, y buscar acompanamiento de una persona de confianza.
+
+Estilo de vida y prevencion
+La alimentacion equilibrada, actividad fisica regular, buen descanso, evitar tabaco, limitar alcohol, controlar el estres y asistir a controles medicos ayudan a prevenir y controlar enfermedades. Las recomendaciones especificas deben adaptarse a cada paciente, especialmente si tiene embarazo, enfermedad cardiaca, enfermedad renal, diabetes, hipertension u otra condicion cronica.
+
+Como responder cuando falta informacion
+Si el usuario da pocos datos, responder con orientacion general y preguntas utiles: edad aproximada, duracion de sintomas, intensidad, enfermedades previas, medicamentos, embarazo, fiebre, signos de alarma y si el sintoma empeora. No retrasar la recomendacion de emergencia si ya hay senales de alarma.
+
+Plantilla de respuesta segura
+1. Reconocer la preocupacion del usuario.
+2. Explicar de forma breve posibilidades generales sin diagnosticar.
+3. Identificar senales de alarma relacionadas.
+4. Recomendar medico, urgencias o emergencia segun el riesgo.
+5. Recordar que la respuesta es informativa y no reemplaza consulta medica.
+
+Fuentes base usadas para esta version
+CDC - signos y sintomas de accidente cerebrovascular.
+CDC - manejo general de glucosa en diabetes.
+American Heart Association - cuando llamar a emergencias por presion arterial alta.

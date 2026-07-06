@@ -54,8 +54,9 @@ public class ChatController {
 	@PutMapping("/read/{doctorId}")
 	public ResponseEntity<MessageResponse> markMessagesAsRead(
 			@PathVariable Long doctorId,
-			@RequestParam("receiverId") Long receiverId) {
-		chatService.markMessagesAsRead(doctorId, receiverId);
+			@RequestParam("receiverId") Long receiverId,
+			@RequestParam(value = "senderUserId", required = false) Long senderUserId) {
+		chatService.markMessagesAsRead(doctorId, receiverId, senderUserId);
 		return ResponseEntity.ok(new MessageResponse("Messages marked as read"));
 	}
 

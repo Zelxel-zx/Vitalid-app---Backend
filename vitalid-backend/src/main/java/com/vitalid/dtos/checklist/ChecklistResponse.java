@@ -15,6 +15,8 @@ public class ChecklistResponse {
     private Long treatmentId;
     private String treatmentTitle;
     private LocalDate date;
+    private LocalDate treatmentStartDate;
+    private LocalDate treatmentEndDate;
     private Integer progress;
     private ChecklistSummaryResponse summary;
     private List<ChecklistMedicationResponse> medications;

@@ -107,6 +107,8 @@ public class ChecklistService {
                 treatment.getId(),
                 treatment.getTitle(),
                 date,
+                treatment.getStartDate(),
+                treatment.getEndDate(),
                 treatment.getProgress(),
                 summary,
                 medicationResponses);

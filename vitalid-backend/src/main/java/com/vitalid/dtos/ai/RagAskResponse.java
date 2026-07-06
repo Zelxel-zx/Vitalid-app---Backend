@@ -5,6 +5,7 @@ import java.util.List;
 public record RagAskResponse(
         String reply,
         boolean answeredFromDocs,
-        List<String> sources
+        List<String> sources,
+        AiAppointmentAction pendingAction
 ) {
 }

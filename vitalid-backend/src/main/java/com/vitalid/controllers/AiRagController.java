@@ -1,8 +1,10 @@
 package com.vitalid.controllers;
 
+import com.vitalid.dtos.ai.AiConfirmAppointmentRequest;
 import com.vitalid.dtos.ai.RagAskRequest;
 import com.vitalid.dtos.ai.RagAskResponse;
 import com.vitalid.dtos.ai.RagIngestResponse;
+import com.vitalid.dtos.appointment.AppointmentResponse;
 import com.vitalid.services.AiRagService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,5 +29,10 @@ public class AiRagController {
     @PostMapping("/ask")
     public RagAskResponse ask(@RequestBody RagAskRequest request) {
         return aiRagService.ask(request);
+    }
+
+    @PostMapping("/confirm")
+    public AppointmentResponse confirm(@RequestBody AiConfirmAppointmentRequest request) {
+        return aiRagService.confirmAppointment(request.action());
     }
 }

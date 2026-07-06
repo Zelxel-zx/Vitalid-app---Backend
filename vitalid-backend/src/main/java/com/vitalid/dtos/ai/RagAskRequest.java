@@ -1,4 +1,7 @@
 package com.vitalid.dtos.ai;
 
-public record RagAskRequest(String message) {
+public record RagAskRequest(
+        String message,
+        AiAppointmentAction pendingAction
+) {
 }

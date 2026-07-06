@@ -6,19 +6,19 @@ import com.vitalid.dtos.auth.RegisterRequest;
 import com.vitalid.exception.InvalidCredentialsException;
 import com.vitalid.exception.ResourceNotFoundException;
 import com.vitalid.models.Doctor;
-import com.vitalid.models.Patient;
 import com.vitalid.models.User;
 import com.vitalid.models.UserType;
 import com.vitalid.repositories.UserRepository;
 import com.vitalid.repositories.DoctorRepository;
 import com.vitalid.repositories.PatientRepository;
 import com.vitalid.security.JwtTokenProvider;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,9 +40,10 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new InvalidCredentialsException("El email ya está registrado");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El email ya esta registrado");
         }
 
         User user = new User();
@@ -54,35 +55,7 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        Long profileId = null;
-
-        if (savedUser.getType() == UserType.DOCTOR) {
-            Doctor doctor = new Doctor();
-            doctor.setUser(savedUser);
-            doctor.setStatus("OFFLINE");
-            doctor.setVerified(false);
-            doctor.setExperienceYears(0);
-            doctor.setUnreadMessages(0);
-            doctor.setSpecialty("General");
-            doctor.setAvailabilityStart(LocalTime.of(9, 0));
-            doctor.setAvailabilityEnd(LocalTime.of(17, 0));
-
-            Doctor savedDoctor = doctorRepository.save(doctor);
-            profileId = savedDoctor.getId();
-        }
-
-        if (savedUser.getType() == UserType.PATIENT) {
-            Patient patient = new Patient();
-            patient.setUser(savedUser);
-            patient.setDateOfBirth(LocalDate.of(2000, 1, 1));
-            patient.setBloodType("No especificado");
-            patient.setIsActive(true);
-
-            Patient savedPatient = patientRepository.save(patient);
-            profileId = savedPatient.getId();
-        }
-
-        String token = jwtTokenProvider.generateToken(savedUser.getEmail());
+        String token = jwtTokenProvider.generateToken(savedUser.getId(), savedUser.getEmail());
 
         return new AuthResponse(
             savedUser.getId(), 
@@ -92,15 +65,15 @@ public class AuthService {
             savedUser.getCreatedAt(),
             token, 
             "Usuario registrado exitosamente",
-            savedUser.isProfileCompleted());  
+            false);
     }
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
+                .orElseThrow(() -> new InvalidCredentialsException("El usuario no existe"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            throw new InvalidCredentialsException("Contraseña incorrecta");
         }
 
         boolean profileCompleted = resolveProfileCompleted(user);

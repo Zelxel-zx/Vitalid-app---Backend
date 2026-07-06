@@ -12,8 +12,11 @@ import com.vitalid.models.User;
 import com.vitalid.models.Appointment;
 import com.vitalid.repositories.UserRepository;
 import com.vitalid.repositories.AppointmentRepository;
+import com.vitalid.repositories.TreatmentRepository;
 import com.vitalid.exception.ResourceNotFoundException;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,6 +37,9 @@ public class PatientController {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private TreatmentRepository treatmentRepository;
 
     /**
      * Get all patients
@@ -146,19 +152,24 @@ public class PatientController {
     }
 
     /**
-     * Get patients filtered by doctor (via appointments)
+     * Get patients filtered by doctor relationship.
+     * A relationship exists when there is a non-cancelled appointment or treatment.
      */
     @GetMapping("/by-doctor/{doctorId}")
     public ApiResponse<List<PatientResponse>> getPatientsByDoctor(@PathVariable Long doctorId) {
-        // Get all appointments for this doctor
         List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
-        // Get unique patient IDs from any non-cancelled appointment with this doctor
-        List<Long> patientIds = appointments.stream()
+
+        Set<Long> patientIds = new LinkedHashSet<>();
+        appointments.stream()
                 .filter(appointment -> !"CANCELLED".equalsIgnoreCase(appointment.getStatus()))
                 .map(a -> a.getPatient().getId())
-                .distinct()
-                .toList();
-        // Get patient records
+                .forEach(patientIds::add);
+
+        treatmentRepository.findByDoctorId(doctorId).stream()
+                .filter(treatment -> !"CANCELLED".equalsIgnoreCase(treatment.getStatus()))
+                .map(treatment -> treatment.getPatient().getId())
+                .forEach(patientIds::add);
+
         List<PatientResponse> patients = patientIds.stream()
                 .map(id -> patientService.getPatientById(id))
                 .toList();

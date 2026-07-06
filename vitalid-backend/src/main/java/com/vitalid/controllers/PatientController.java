@@ -152,8 +152,9 @@ public class PatientController {
     public ApiResponse<List<PatientResponse>> getPatientsByDoctor(@PathVariable Long doctorId) {
         // Get all appointments for this doctor
         List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
-        // Get unique patient IDs
+        // Get unique patient IDs from any non-cancelled appointment with this doctor
         List<Long> patientIds = appointments.stream()
+                .filter(appointment -> !"CANCELLED".equalsIgnoreCase(appointment.getStatus()))
                 .map(a -> a.getPatient().getId())
                 .distinct()
                 .toList();

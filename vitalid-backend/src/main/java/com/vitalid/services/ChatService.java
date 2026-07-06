@@ -117,16 +117,17 @@ public class ChatService {
         return messageRepository.countByReceiverIdAndIsReadFalse(receiverId);
     }
 
-    public void markMessagesAsRead(Long doctorId, Long receiverId) {
+    public void markMessagesAsRead(Long doctorId, Long receiverId, Long senderUserId) {
         if (doctorId == null || receiverId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Doctor and receiver are required");
         }
         var doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"));
         Long doctorUserId = doctor.getUser().getId();
+        Long senderId = senderUserId != null ? senderUserId : doctorUserId;
 
         List<Message> messages = messageRepository.findBySenderIdAndReceiverIdAndIsReadFalse(
-                doctorUserId,
+                senderId,
                 receiverId
         );
         for (Message message : messages) {

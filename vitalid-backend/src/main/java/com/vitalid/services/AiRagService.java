@@ -3,6 +3,7 @@ package com.vitalid.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vitalid.dtos.ai.AiAppointmentAction;
+import com.vitalid.dtos.ai.AiConfigResponse;
 import com.vitalid.dtos.ai.RagAskRequest;
 import com.vitalid.dtos.ai.RagAskResponse;
 import com.vitalid.dtos.ai.RagIngestResponse;
@@ -280,6 +281,21 @@ public class AiRagService {
                     "Groq appointment action format is invalid: " + summarizeProviderText(content),
                     exception);
         }
+    }
+
+    public AiConfigResponse getConfig() {
+        String normalizedKey = apiKey == null ? "" : apiKey.trim();
+        String preview = normalizedKey.isBlank()
+                ? "empty"
+                : normalizedKey.substring(0, Math.min(4, normalizedKey.length()))
+                + "..."
+                + normalizedKey.substring(Math.max(0, normalizedKey.length() - 4));
+        return new AiConfigResponse(
+                !normalizedKey.isBlank(),
+                preview,
+                normalizedKey.length(),
+                chatModel
+        );
     }
 
     private AiAppointmentAction buildAppointmentAction(AppointmentExtraction extraction) {

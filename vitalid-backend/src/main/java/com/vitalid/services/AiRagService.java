@@ -267,6 +267,7 @@ public class AiRagService {
                         Map.of("role", "system", "content", prompt),
                         Map.of("role", "user", "content", message)
                 ),
+                "response_format", Map.of("type", "json_object"),
                 "temperature", 0,
                 "max_tokens", 500
         );
@@ -275,11 +276,9 @@ public class AiRagService {
         try {
             return objectMapper.readValue(extractJsonObject(content), AppointmentExtraction.class);
         } catch (JsonProcessingException exception) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Groq appointment action format is invalid",
-                    exception
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                    "Groq appointment action format is invalid: " + summarizeProviderText(content),
+                    exception);
         }
     }
 
@@ -597,12 +596,36 @@ public class AiRagService {
     }
 
     private String extractJsonObject(String content) {
+        if (content == null || content.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq did not return JSON");
+        }
+        String trimmed = content.trim();
+        if (trimmed.startsWith("```")) {
+            trimmed = trimmed
+                    .replaceFirst("^```(?:json)?\\s*", "")
+                    .replaceFirst("\\s*```$", "")
+                    .trim();
+        }
+        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+            return trimmed;
+        }
+
         int start = content.indexOf('{');
         int end = content.lastIndexOf('}');
         if (start < 0 || end <= start) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Groq did not return JSON");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Groq did not return JSON: " + summarizeProviderText(content));
         }
         return content.substring(start, end + 1);
+    }
+
+    private String summarizeProviderText(String content) {
+        if (content == null || content.isBlank()) {
+            return "empty response";
+        }
+        String compact = content.replaceAll("\\s+", " ").trim();
+        return compact.length() > 180 ? compact.substring(0, 180) + "..." : compact;
     }
 
     private String sanitizeProviderError(String responseBody) {
